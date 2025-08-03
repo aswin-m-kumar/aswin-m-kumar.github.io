@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     window.addEventListener('scroll', highlightNavigation);
 
-    // --- SMART CONTACT FORM ---
+    // --- SMART CONTACT FORM with Formspree Integration ---
     const contactForm = document.getElementById('contactForm');
     const submitBtn = document.getElementById('contactSubmitBtn');
     const formResponseDiv = document.getElementById('form-response');
@@ -127,37 +127,55 @@ document.addEventListener('DOMContentLoaded', function() {
         contactForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const name = document.getElementById('contactName').value;
-            const email = document.getElementById('contactEmail').value;
-            const message = document.getElementById('contactMessage').value;
+            const formData = new FormData(contactForm);
             const originalBtnText = submitBtn.innerHTML;
 
-            submitBtn.innerHTML = 'Thinking...';
+            submitBtn.innerHTML = 'Sending...';
             submitBtn.disabled = true;
 
-            const prompt = `
-                You are a friendly and professional assistant for Aswin M Kumar, an engineering student. 
-                A person named ${name} has sent the following message through his portfolio contact form. 
-                Analyze the message and draft a brief, encouraging, and relevant reply that I can show as an instant confirmation.
-                Keep it under 30 words.
-                The message is: "${message}"
-            `;
-            
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: prompt }] }]
-            };
-
+            // --- First, submit the form data to Formspree ---
             try {
-                const response = await fetch(API_URL, {
+                const formspreeResponse = await fetch(contactForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!formspreeResponse.ok) {
+                    // If Formspree fails, show an error and stop
+                    throw new Error('Failed to send message. Please try again later.');
+                }
+                
+                // --- If Formspree is successful, then call Gemini API for the smart reply ---
+                const message = formData.get('message');
+                const name = formData.get('name');
+
+                const prompt = `
+                    You are a friendly and professional assistant for Aswin M Kumar, an engineering student. 
+                    A person named ${name} has sent the following message through his portfolio contact form. 
+                    Analyze the message and draft a brief, encouraging, and relevant reply that I can show as an instant confirmation.
+                    Keep it under 30 words.
+                    The message is: "${message}"
+                `;
+                
+                const payload = {
+                    contents: [{ role: "user", parts: [{ text: prompt }] }]
+                };
+
+                const geminiResponse = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                const result = await response.json();
 
                 let aiResponse = "Thank you for your message! I'll get back to you soon.";
-                if (result.candidates && result.candidates[0].content.parts[0].text) {
-                    aiResponse = result.candidates[0].content.parts[0].text;
+                if (geminiResponse.ok) {
+                    const result = await geminiResponse.json();
+                    if (result.candidates && result.candidates[0].content.parts[0].text) {
+                        aiResponse = result.candidates[0].content.parts[0].text;
+                    }
                 }
                 
                 formResponseDiv.textContent = `✨ ${aiResponse}`;
@@ -167,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 contactForm.reset();
 
             } catch (error) {
-                console.error("Error with contact form AI:", error);
+                console.error("Error with contact form submission:", error);
                 formResponseDiv.textContent = 'Sorry, there was an error. Please try sending your message again.';
                 formResponseDiv.className = 'form-response error';
                 formResponseDiv.style.display = 'block';
