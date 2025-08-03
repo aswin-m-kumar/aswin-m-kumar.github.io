@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Circuit Master Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <style>
+        /* --- Base Styles & Variables --- */
+        :root {
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --surface: #374151;
+            --primary: #38bdf8;
+            --secondary: #818cf8;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-tertiary: #9ca3af;
+            --border-color: #4b5563;
+            --shadow-color: rgba(0, 0, 0, 0.25);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px; /* pill shape */
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--bg-primary);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+        .btn-secondary {
+            background-color: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+            transform: translateY(-2px);
+        }
+
+        /* --- Navigation Bar --- */
+        .navbar {
+            background-color: rgba(31, 41, 55, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        /* --- Section Titles --- */
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .section-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+        }
+
+        /* --- Footer --- */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-tertiary);
+        }
+        
+        /* --- PAGE STRUCTURE --- */
+        .game-page {
+            padding-top: 120px; /* Space for fixed navbar */
+            padding-bottom: 4rem;
+            background-color: var(--bg-primary);
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        /* --- GAME CONTAINER --- */
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        #gameCanvas {
+            background-color: var(--surface);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--shadow-color);
+            max-width: 100%;
+            height: auto;
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* --- MODAL STYLES --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1001; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            position: relative;
+            animation: slide-down 0.5s ease-out;
+            text-align: center;
+        }
+        @keyframes slide-down {
+            from { transform: translateY(-50px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .close-button {
+            color: var(--text-tertiary);
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: var(--text-primary);
+        }
+        .modal-content ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+        .modal-content ul li {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .modal-body {
+            color: var(--text-secondary);
+            margin: 1rem 0 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">
+          <span class="logo-text">Circuit Master</span>
+        </div>
+        <a href="index.html" class="nav-link">
+            <span class="material-icons">arrow_back</span>
+            Back to Home
+        </a>
+      </div>
+    </nav>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Game Section -->
+    <main class="game-page">
+      <div class="container">
+        <h1 class="section-title">Complete the Circuit</h1>
+        <p class="section-description">
+          Rotate the tiles to connect the power source to the light bulb and light it up!
+        </p>
+
+        <div class="game-container">
+            <canvas id="gameCanvas" width="500" height="500"></canvas>
+            <div class="game-controls">
+                <button id="resetBtn" class="btn btn-secondary">
+                    <span class="material-icons">refresh</span>
+                    Reset Level
+                </button>
+                <button id="instructionsBtn" class="btn btn-primary">
+                    <span class="material-icons">help_outline</span>
+                    Instructions
+                </button>
+            </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Instructions Modal -->
+    <div id="instructionsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 class="modal-title">How to Play</h2>
+            <ul>
+                <li><span class="material-icons" style="color: var(--primary);">emoji_objects</span>Your goal is to light up the bulb 💡.</li>
+                <li><span class="material-icons" style="color: var(--primary);">power</span>Create a continuous path from the power source 🔋 to the bulb.</li>
+                <li><span class="material-icons" style="color: var(--primary);">rotate_right</span>Click on any wire or corner piece to rotate it 90 degrees clockwise.</li>
+                <li><span class="material-icons" style="color: var(--primary);">celebration</span>Once the circuit is complete, the bulb will light up!</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Win Modal -->
+    <div id="winModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Circuit Complete!</h2>
+            <p class="modal-body">
+                Congratulations! You successfully powered the bulb.
+            </p>
+            <button id="playAgainBtn" class="btn btn-primary">
+                <span class="material-icons">replay</span>
+                Play Again
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <p>&copy; 2025 Circuit Master. A fun logic puzzle.</p>
+      </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Canvas and DOM Elements ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const resetBtn = document.getElementById('resetBtn');
+        const instructionsBtn = document.getElementById('instructionsBtn');
+        
+        // Modals
+        const instructionsModal = document.getElementById('instructionsModal');
+        const winModal = document.getElementById('winModal');
+        const closeInstructionsBtn = instructionsModal.querySelector('.close-button');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+
+        // --- Game Constants ---
+        const GRID_SIZE = 5;
+        const TILE_SIZE = canvas.width / GRID_SIZE;
+
+        // Component Types
+        const EMPTY = 0;
+        const POWER = 1;
+        const BULB = 2;
+        const WIRE_I = 3; // Straight wire
+        const WIRE_L = 4; // Corner wire
+
+        // Directions (using a bitmask for easy connection checking)
+        const UP = 1, DOWN = 2, LEFT = 4, RIGHT = 8;
+
+        // --- Game State ---
+        let level;
+        let winState = false;
+
+        // --- NEW SOLVABLE LEVEL CONFIGURATION ---
+        // This level is guaranteed to be solvable. The bulb at the end
+        // now correctly accepts a connection from the left.
+        const initialLevel = [
+            [ { type: POWER, rotation: 1 }, { type: EMPTY },               { type: EMPTY },               { type: EMPTY },               { type: EMPTY } ],
+            [ { type: WIRE_I, rotation: 1 }, { type: EMPTY },               { type: EMPTY },               { type: EMPTY },               { type: EMPTY } ],
+            [ { type: WIRE_L, rotation: 2 }, { type: WIRE_I, rotation: 0 }, { type: WIRE_L, rotation: 1 }, { type: EMPTY },               { type: EMPTY } ],
+            [ { type: EMPTY },               { type: EMPTY },               { type: WIRE_I, rotation: 1 }, { type: EMPTY },               { type: EMPTY } ],
+            [ { type: EMPTY },               { type: EMPTY },               { type: WIRE_L, rotation: 3 }, { type: WIRE_I, rotation: 0 }, { type: BULB, rotation: 2 } ]
+        ];
+        
+        /**
+         * Determines the connections for a tile based on its type and rotation.
+         * @param {object} tile - The tile object {type, rotation}.
+         * @returns {number} A bitmask representing the open connections (UP, DOWN, LEFT, RIGHT).
+         */
+        function getConnections(tile) {
+            switch (tile.type) {
+                case POWER:
+                case BULB:
+                    // Power and Bulb only have one connection point.
+                    return [UP, DOWN, LEFT, RIGHT][tile.rotation];
+                case WIRE_I: // Straight wire
+                    // Vertical if rotation is 0 or 2, horizontal otherwise.
+                    return tile.rotation % 2 === 0 ? (UP | DOWN) : (LEFT | RIGHT);
+                case WIRE_L: // Corner wire
+                    // Each rotation corresponds to a different corner.
+                    return [UP | RIGHT, RIGHT | DOWN, DOWN | LEFT, LEFT | UP][tile.rotation];
+                default:
+                    return 0; // No connections for empty tiles.
+            }
+        }
+
+        /**
+         * Initializes or resets the game to its starting state.
+         */
+        function init() {
+            winState = false;
+            winModal.classList.remove('show');
+            // Create a deep copy of the level to avoid modifying the original config.
+            level = JSON.parse(JSON.stringify(initialLevel));
+            checkWinCondition(); // Check initial state (in case it's already solved)
+            drawBoard();
+        }
+
+        /**
+         * Draws the entire game board on the canvas.
+         */
+        function drawBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    drawTile(x, y, level[y][x]);
+                }
+            }
+        }
+
+        /**
+         * Draws a single tile at a given x, y coordinate.
+         * @param {number} x - The grid x-coordinate.
+         * @param {number} y - The grid y-coordinate.
+         * @param {object} tile - The tile to draw.
+         */
+        function drawTile(x, y, tile) {
+            const px = x * TILE_SIZE;
+            const py = y * TILE_SIZE;
+            const isPowered = tile.powered;
+
+            // Draw base tile background
+            ctx.fillStyle = isPowered ? '#4a5568' : '#374151'; 
+            ctx.fillRect(px + 2, py + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+            
+            // Draw the wire/connection path
+            ctx.strokeStyle = isPowered ? '#38bdf8' : '#9ca3af'; 
+            ctx.lineWidth = 10;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+
+            const connections = getConnections(tile);
+            const centerX = px + TILE_SIZE / 2;
+            const centerY = py + TILE_SIZE / 2;
+
+            if (connections & UP) { ctx.moveTo(centerX, centerY); ctx.lineTo(centerX, py); }
+            if (connections & DOWN) { ctx.moveTo(centerX, centerY); ctx.lineTo(centerX, py + TILE_SIZE); }
+            if (connections & LEFT) { ctx.moveTo(centerX, centerY); ctx.lineTo(px, centerY); }
+            if (connections & RIGHT) { ctx.moveTo(centerX, centerY); ctx.lineTo(px + TILE_SIZE, centerY); }
+            
+            ctx.stroke();
+
+            // Draw special components (Power/Bulb emojis)
+            if (tile.type === POWER || tile.type === BULB) {
+                ctx.font = `${TILE_SIZE * 0.5}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(tile.type === POWER ? '🔋' : '💡', centerX, centerY);
+                
+                // Add a glow effect to the powered bulb
+                if (tile.type === BULB && isPowered) {
+                     ctx.fillStyle = 'rgba(56, 189, 248, 0.3)';
+                     ctx.beginPath();
+                     ctx.arc(centerX, centerY, TILE_SIZE/2.5, 0, Math.PI * 2);
+                     ctx.fill();
+                }
+            }
+        }
+
+        /**
+         * Checks the entire grid to see if the bulb is powered.
+         * Uses a Breadth-First Search (BFS) algorithm starting from the power source.
+         */
+        function checkWinCondition() {
+            // Reset power state for all tiles before re-calculating.
+            level.forEach(row => row.forEach(tile => tile.powered = false));
+
+            const powerSource = {x: 0, y: 0}; // Assuming power is always at (0,0)
+            const queue = [powerSource];
+            level[powerSource.y][powerSource.x].powered = true;
+            const visited = new Set([`${powerSource.x},${powerSource.y}`]);
+
+            // BFS traversal to find all powered tiles
+            while (queue.length > 0) {
+                const curr = queue.shift();
+                const connections = getConnections(level[curr.y][curr.x]);
+
+                // Define potential neighbors and the required connections
+                const neighbors = [
+                    { x: curr.x, y: curr.y - 1, from: DOWN, to: UP },    // Up
+                    { x: curr.x, y: curr.y + 1, from: UP, to: DOWN },    // Down
+                    { x: curr.x - 1, y: curr.y, from: RIGHT, to: LEFT }, // Left
+                    { x: curr.x + 1, y: curr.y, from: LEFT, to: RIGHT }, // Right
+                ];
+
+                for (const n of neighbors) {
+                    // Check if neighbor is within grid bounds and not yet visited
+                    if (n.x >= 0 && n.x < GRID_SIZE && n.y >= 0 && n.y < GRID_SIZE && !visited.has(`${n.x},${n.y}`)) {
+                        const neighborTile = level[n.y][n.x];
+                        const neighborConnections = getConnections(neighborTile);
+                        
+                        // Check for a valid two-way connection
+                        if ((connections & n.to) && (neighborConnections & n.from)) {
+                            neighborTile.powered = true;
+                            visited.add(`${n.x},${n.y}`);
+                            queue.push({x: n.x, y: n.y});
+                        }
+                    }
+                }
+            }
+
+            // Check if the bulb is powered to determine the win state
+            const bulbTile = level[GRID_SIZE - 1][GRID_SIZE - 1]; // Assuming bulb is at the end
+            if (bulbTile.powered && !winState) {
+                winState = true;
+                // Use a timeout to allow the final draw to render before showing the modal
+                setTimeout(() => {
+                    winModal.classList.add('show');
+                }, 200);
+            }
+            drawBoard();
+        }
+
+
+        // --- Event Listeners ---
+        
+        // Handle clicks on the game canvas
+        canvas.addEventListener('click', (e) => {
+            if (winState) return; // Don't allow clicks after winning
+
+            const rect = canvas.getBoundingClientRect();
+            // Scale click coordinates to canvas resolution
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = Math.floor((e.clientX - rect.left) * scaleX / TILE_SIZE);
+            const y = Math.floor((e.clientY - rect.top) * scaleY / TILE_SIZE);
+
+            if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
+                const tile = level[y][x];
+                // Only allow rotation of wires
+                if (tile.type === WIRE_I || tile.type === WIRE_L) {
+                    tile.rotation = (tile.rotation + 1) % 4; // Cycle through 4 rotations
+                    checkWinCondition();
+                }
+            }
+        });
+
+        // Control buttons
+        resetBtn.addEventListener('click', init);
+        playAgainBtn.addEventListener('click', init);
+
+        // Modal controls
+        instructionsBtn.addEventListener('click', () => instructionsModal.classList.add('show'));
+        closeInstructionsBtn.addEventListener('click', () => instructionsModal.classList.remove('show'));
+        
+        // Close modal if clicking on the background overlay
+        window.addEventListener('click', (e) => {
+            if (e.target == instructionsModal) {
+                instructionsModal.classList.remove('show');
+            }
+        });
+
+        // --- Initial Game Start ---
+        init();
+    });
+    </script>
+</body>
+</html>
