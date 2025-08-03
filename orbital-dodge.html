@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbital Dodge Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            touch-action: none; /* Disables double-tap to zoom on mobile */
+        }
+        canvas {
+            display: block;
+            background-color: #0a0a0a;
+            cursor: pointer;
+        }
+        .unselectable {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .modal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+        .modal-content {
+            background-color: #1a1a1a;
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            color: white;
+            border: 1px solid #333;
+            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.1);
+            max-width: 90%;
+            width: 500px;
+        }
+        .gemini-button {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+        .gemini-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99,102,241,0.4);
+        }
+        .gemini-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .story-text {
+            font-style: italic;
+            color: #cbd5e1;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body class="bg-black text-white flex items-center justify-center h-screen m-0 unselectable">
+
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- UI Elements -->
+    <div class="absolute top-5 left-5 text-lg md:text-xl">Score: <span id="score">0</span></div>
+    <div class="absolute top-5 right-5 text-lg md:text-xl">High Score: <span id="highScore">0</span></div>
+
+    <!-- Start/Game Over Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h1 id="modalTitle" class="text-4xl md:text-5xl font-bold mb-4 text-cyan-300">Orbital Dodge</h1>
+            <p id="modalText" class="text-lg mb-6">Click or Tap to change orbit direction. Dodge the red cubes.</p>
+            <p id="finalScore" class="text-2xl mt-4 font-semibold hidden"></p>
+            <button id="startButton" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 px-8 rounded-lg text-xl transition duration-300">Start Game</button>
+            
+            <!-- Gemini Features -->
+            <div id="gemini-features" class="mt-4">
+                 <button id="storyButton" class="gemini-button">✨ Tell Me The Story</button>
+                 <p id="storyText" class="story-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // --- Gemini API Configuration ---
+        const API_KEY = ""; // This is handled by the environment, no need to add a key here.
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
+
+        // UI Elements
+        const scoreEl = document.getElementById('score');
+        const highScoreEl = document.getElementById('highScore');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalText = document.getElementById('modalText');
+        const startButton = document.getElementById('startButton');
+        const finalScoreEl = document.getElementById('finalScore');
+        const storyButton = document.getElementById('storyButton');
+        const storyText = document.getElementById('storyText');
+        const geminiFeaturesDiv = document.getElementById('gemini-features');
+
+
+        let player, center, projectiles, score, highScore, animationId, isGameOver;
+        let angle = 0;
+        let orbitalDirection = 1; // 1 for counter-clockwise, -1 for clockwise
+        let orbitalRadius;
+        let projectileSpawnInterval;
+
+        // --- Gemini API Helper Function ---
+        async function callGemini(prompt, loadingElement) {
+            if (loadingElement) loadingElement.innerText = 'Thinking...';
+            try {
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    throw new Error(`API call failed with status: ${response.status}`);
+                }
+                const result = await response.json();
+                if (result.candidates && result.candidates[0].content.parts[0].text) {
+                    return result.candidates[0].content.parts[0].text.replace(/["']/g, ""); // Clean quotes
+                }
+                return null;
+            } catch (error) {
+                console.error("Gemini API call failed:", error);
+                return null; // Return null on error
+            }
+        }
+
+        // --- Game Setup and Control ---
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            isGameOver = false;
+            score = 0;
+            highScore = localStorage.getItem('orbitalDodgeHighScore') || 0;
+            scoreEl.innerText = score;
+            highScoreEl.innerText = highScore;
+            center = { x: canvas.width / 2, y: canvas.height / 2 };
+            orbitalRadius = Math.min(canvas.width, canvas.height) / 5;
+            player = { x: center.x + orbitalRadius, y: center.y, radius: 15, color: '#00ffff' };
+            projectiles = [];
+            modal.style.display = 'none';
+            finalScoreEl.classList.add('hidden');
+            if (animationId) cancelAnimationFrame(animationId);
+            animate();
+            if (projectileSpawnInterval) clearInterval(projectileSpawnInterval);
+            projectileSpawnInterval = setInterval(spawnProjectile, 1000);
+        }
+
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.25)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, 10, 0, Math.PI * 2, false);
+            ctx.fillStyle = '#4a4a4a';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, orbitalRadius, 0, Math.PI * 2, false);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.stroke();
+            updatePlayer();
+            drawPlayer();
+            projectiles.forEach((projectile, index) => {
+                projectile.update();
+                projectile.draw();
+                const dist = Math.hypot(player.x - projectile.x, player.y - projectile.y);
+                if (dist - projectile.size / 2 - player.radius < 1) {
+                    endGame();
+                }
+                if (projectile.x + projectile.size < 0 || projectile.x - projectile.size > canvas.width || projectile.y + projectile.size < 0 || projectile.y - projectile.size > canvas.height) {
+                    setTimeout(() => {
+                        projectiles.splice(index, 1);
+                        updateScore(10);
+                    }, 0);
+                }
+            });
+        }
+        
+        // --- Player Logic ---
+
+        function drawPlayer() {
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2, false);
+            ctx.fillStyle = player.color;
+            ctx.shadowColor = player.color;
+            ctx.shadowBlur = 15;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+
+        function updatePlayer() {
+            angle += 0.02 * orbitalDirection;
+            player.x = center.x + Math.cos(angle) * orbitalRadius;
+            player.y = center.y + Math.sin(angle) * orbitalRadius;
+        }
+        
+        function switchDirection() {
+            if(isGameOver) return;
+            orbitalDirection *= -1;
+        }
+
+        // --- Projectile Logic ---
+
+        class Projectile {
+            constructor(x, y, velocity, size, color) {
+                this.x = x; this.y = y; this.velocity = velocity; this.size = size; this.color = color;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 10;
+                ctx.fillRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
+                ctx.shadowBlur = 0;
+            }
+            update() {
+                this.x += this.velocity.x; this.y += this.velocity.y;
+            }
+        }
+
+        function spawnProjectile() {
+            const size = Math.random() * 20 + 10;
+            const color = '#ff4d4d';
+            let x, y;
+            if (Math.random() < 0.5) {
+                x = Math.random() < 0.5 ? 0 - size : canvas.width + size;
+                y = Math.random() * canvas.height;
+            } else {
+                x = Math.random() * canvas.width;
+                y = Math.random() < 0.5 ? 0 - size : canvas.height + size;
+            }
+            const angleToCenter = Math.atan2(center.y - y, center.x - x);
+            const speed = 1.5 + score / 500;
+            const velocity = { x: Math.cos(angleToCenter) * speed, y: Math.sin(angleToCenter) * speed };
+            projectiles.push(new Projectile(x, y, velocity, size, color));
+        }
+        
+        // --- Game State & UI ---
+
+        function updateScore(points) {
+            score += points;
+            scoreEl.innerText = score;
+        }
+
+        async function endGame() {
+            isGameOver = true;
+            cancelAnimationFrame(animationId);
+            clearInterval(projectileSpawnInterval);
+
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('orbitalDodgeHighScore', highScore);
+                highScoreEl.innerText = highScore;
+            }
+            
+            modal.style.display = 'flex';
+            modalTitle.innerText = 'Game Over';
+            finalScoreEl.innerText = `Final Score: ${score}`;
+            finalScoreEl.classList.remove('hidden');
+            startButton.innerText = 'Play Again';
+            geminiFeaturesDiv.style.display = 'none'; // Hide story button on game over
+
+            const gameOverPrompt = `You are a witty and slightly sarcastic AI game master. A player just finished a game of 'Orbital Dodge' with a score of ${score}. Write a short, clever, one-sentence comment about their performance. If the score is low (under 100), be funny and taunting. If the score is medium (100-500), be encouraging but still a bit sassy. If the score is high (over 500), be genuinely impressed and epic.`;
+            
+            modalText.innerText = 'Calculating your fate...';
+            const aiMessage = await callGemini(gameOverPrompt);
+            modalText.innerText = aiMessage || 'You were hit!'; // Fallback message
+        }
+
+        async function showStartScreen() {
+             modal.style.display = 'flex';
+             modalText.innerText = 'Click or Tap to change orbit direction. Dodge the red cubes.';
+             startButton.innerText = 'Start Game';
+             finalScoreEl.classList.add('hidden');
+             geminiFeaturesDiv.style.display = 'block'; // Show gemini features
+             storyText.innerText = ''; // Clear old story
+
+             const titlePrompt = "Generate a single, cool, and epic-sounding name for a space-themed arcade game about dodging projectiles. The name should be short, 2-4 words max. Examples: 'Cosmic Drift', 'Void Runner', 'Starfall'. Do not add quotes or any other text around the name.";
+             
+             modalTitle.innerText = "Loading...";
+             const newTitle = await callGemini(titlePrompt);
+             modalTitle.innerText = newTitle || 'Orbital Dodge'; // Fallback title
+        }
+
+        // --- Event Listeners ---
+
+        window.addEventListener('resize', () => {
+            if (!isGameOver) {
+                init();
+            } else {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                center = { x: canvas.width / 2, y: canvas.height / 2 };
+                orbitalRadius = Math.min(canvas.width, canvas.height) / 5;
+            }
+        });
+
+        canvas.addEventListener('mousedown', switchDirection);
+        
+        startButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            init();
+        });
+
+        storyButton.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            storyButton.disabled = true;
+            const storyPrompt = "You are a master sci-fi storyteller. Write a very short (3-4 sentences) but epic and dramatic backstory for a lone pilot in a tiny ship, endlessly dodging a storm of cosmic projectiles in a forgotten nebula. Make it sound like the beginning of a legendary space opera.";
+            
+            storyText.innerText = 'Crafting your legend...';
+            const aiStory = await callGemini(storyPrompt);
+            storyText.innerText = aiStory || "In the vastness of space, a hero must rise..."; // Fallback story
+            storyButton.disabled = false;
+        });
+
+        // Initial call to show start screen
+        window.onload = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            highScoreEl.innerText = localStorage.getItem('orbitalDodgeHighScore') || 0;
+            showStartScreen();
+        };
+
+    </script>
+</body>
+</html>
