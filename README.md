@@ -45,6 +45,7 @@ Open the index.html file in your web browser to view the portfolio locally.
 A big thank you to the open-source community for the inspiration and tools that made this project possible.
 
 📬 Contact
+
 LinkedIn: @aswinmkumar
 
 GitHub: @aswin-m-kumar
