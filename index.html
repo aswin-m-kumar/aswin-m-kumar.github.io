@@ -5,90 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aswin M Kumar - Portfolio</title>
     <link rel="stylesheet" href="styles.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   </head>
   <body>
-    <!-- Navigation -->
+
+    <!-- ═══════════════ NAVIGATION ═══════════════ -->
     <nav class="navbar">
       <div class="nav-container">
         <div class="nav-logo">
           <span class="logo-text">Aswin M Kumar</span>
         </div>
         <div class="nav-menu">
-          <a href="#home" class="nav-link">Home</a>
-          <a href="#about" class="nav-link">About</a>
+          <a href="#home"         class="nav-link">Home</a>
+          <a href="#about"        class="nav-link">About</a>
           <a href="experience.html" class="nav-link">Experience</a>
-          <a href="#skills" class="nav-link">Skills</a>
-          <a href="#projects" class="nav-link">Projects</a>
+          <a href="#skills"       class="nav-link">Skills</a>
+          <a href="#projects"     class="nav-link">Projects</a>
           <a href="#certificates" class="nav-link">Certificates</a>
-          <a href="#contact" class="nav-link">Contact</a>
+          <a href="#contact"      class="nav-link">Contact</a>
           <button class="theme-toggle" id="themeToggle">
             <span class="material-icons">light_mode</span>
           </button>
         </div>
         <div class="hamburger" id="hamburger">
-          <span></span>
-          <span></span>
-          <span></span>
+          <span></span><span></span><span></span>
         </div>
       </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- ═══════════════ HERO ═══════════════ -->
     <section id="home" class="hero">
       <div class="hero-container">
         <div class="hero-content">
-          <div class="hero-text">
+
+          <!-- Text side -->
+          <div class="hero-text" data-reveal="fade-up" data-delay="100">
             <h1 class="hero-title">Hi, I'm Aswin M Kumar</h1>
-            <p class="hero-subtitle">
-              Electrical &amp; Electronics Engineering Student
-            </p>
+            <p class="hero-subtitle">Electrical &amp; Electronics Engineering Student</p>
             <p class="hero-description">
-              Passionate about harnessing technology to address global
-              challenges through innovative solutions in AI, IoT, and
-              sustainable technologies.
+              Passionate about harnessing technology to address global challenges through
+              innovative solutions in AI, IoT, and sustainable technologies.
             </p>
             <div class="hero-buttons">
               <a href="#projects" class="btn btn-primary">View Projects</a>
-              <a href="https://aswin-m-kumar.github.io/resume/Aswin_M_Kumar-Resume.pdf" class="btn btn-secondary" target="_blank">
+              <a href="https://aswin-m-kumar.github.io/resume/Aswin_M_Kumar-Resume.pdf"
+                 class="btn btn-secondary" target="_blank">
                 <span class="material-icons">description</span>
                 View Resume
               </a>
             </div>
           </div>
-          <div
-            class="hero-image-placeholder"
-            style="
-              width: 160px;
-              height: 160px;
-              background: #e0e0e0;
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              margin: 1.5rem auto;
-            "
-          >
-            <img
-              src="asset/pfp.png"
-              alt="Profile Picture"
-              style="
-                width: 200px;
-                height: 200px;
-                border-radius: 50%;
-                object-fit: cover;
-                box-shadow: 0 2px 8px #bbb;
-              "
-            />
+
+          <!-- Profile pic -->
+          <div class="hero-image-placeholder"
+               data-reveal="zoom" data-delay="200"
+               style="width:160px;height:160px;background:#e0e0e0;border-radius:50%;
+                      display:flex;align-items:center;justify-content:center;margin:1.5rem auto;">
+            <img src="asset/pfp.png" alt="Profile Picture"
+                 style="width:200px;height:200px;border-radius:50%;object-fit:cover;box-shadow:0 4px 20px rgba(99,102,241,.3);" />
           </div>
-          <div class="hero-visual">
+
+          <!-- Floating cards -->
+          <div class="hero-visual" data-reveal="fade-up" data-delay="300">
             <div class="floating-card">
               <div class="card-content">
                 <span class="material-icons">engineering</span>
@@ -107,7 +86,7 @@
               <div class="card-content">
                 <span class="material-icons">devices_other</span>
                 <h3>IoT Developer</h3>
-                <p>ESP32, Arduino, Embedded Systems</p>
+                <p>ESP32, Arduino, Embedded</p>
               </div>
             </div>
             <div class="floating-card">
@@ -125,34 +104,31 @@
       </div>
     </section>
 
-    <!-- About Section -->
+    <!-- ═══════════════ ABOUT ═══════════════ -->
     <section id="about" class="about">
       <div class="container">
-        <h2 class="section-title">About Me</h2>
+        <h2 class="section-title" data-reveal="fade-up">About Me</h2>
         <div class="about-content">
-          <div class="about-text">
+          <div class="about-text" data-reveal="fade-left" data-delay="100">
             <p>
-              I'm an enthusiastic Electrical and Electronics Engineering student
-              at the College of Engineering, Trivandrum, with experiences in
-              Circuit Design, C, Python, and Flutter. My passion lies in
-              developing innovative solutions that address real-world challenges
+              I'm an enthusiastic Electrical and Electronics Engineering student at the College of
+              Engineering, Trivandrum, with experience in Circuit Design, C, Python, and Flutter. My
+              passion lies in developing innovative solutions that address real-world challenges
               through technology.
             </p>
             <p>
-              I've worked on projects like <strong>Trash Nada</strong>, an
-              AI-driven waste management system that was ranked among the top 10
-              at the Satwa National Hackathon. I'm interested in creating
-              cross-platform applications, simulating hardware interactions, and
-              applying machine learning to solve complex problems.
+              I've worked on projects like <strong>Trash Nada</strong>, an AI-driven waste management
+              system ranked among the top 10 at the Satwa National Hackathon. I'm interested in
+              creating cross-platform applications, simulating hardware interactions, and applying
+              machine learning to solve complex problems.
             </p>
             <p>
-              Currently seeking internship or entry-level opportunities to
-              contribute my technical skills and collaborative spirit to
-              pioneering projects while deepening my knowledge in embedded
-              systems, IoT, and AI.
+              Currently seeking internship or entry-level opportunities to contribute my technical
+              skills and collaborative spirit to pioneering projects while deepening my knowledge in
+              embedded systems, IoT, and AI.
             </p>
           </div>
-          <div class="about-stats">
+          <div class="about-stats" data-reveal="fade-right" data-delay="200">
             <div class="stat-card">
               <h3>3rd</h3>
               <p>Year Student</p>
@@ -166,14 +142,14 @@
       </div>
     </section>
 
-    <!-- Experience Section Link -->
+    <!-- ═══════════════ EXPERIENCE LINK ═══════════════ -->
     <section class="experience-link-section">
       <div class="container">
-        <h2 class="section-title">My Experience</h2>
-        <p class="section-description">
-          Dive deeper into my professional journey, including internships, training programs, and key roles I've undertaken.
+        <h2 class="section-title" data-reveal="fade-up">My Experience</h2>
+        <p class="section-description" data-reveal="fade-up" data-delay="80">
+          Dive deeper into my professional journey, including internships, training programs, and key roles.
         </p>
-        <div style="text-align: center;">
+        <div style="text-align:center;" data-reveal="zoom" data-delay="160">
           <a href="experience.html" class="btn btn-primary">
             Explore My Experience
             <span class="material-icons">arrow_forward</span>
@@ -182,12 +158,13 @@
       </div>
     </section>
 
-    <!-- Skills Section -->
+    <!-- ═══════════════ SKILLS ═══════════════ -->
     <section id="skills" class="skills">
       <div class="container">
-        <h2 class="section-title">Technical Skills</h2>
+        <h2 class="section-title" data-reveal="fade-up">Technical Skills</h2>
         <div class="skills-grid">
-          <div class="skill-category">
+
+          <div class="skill-category" data-reveal="fade-up" data-delay="0">
             <h3>Programming</h3>
             <div class="skill-items">
               <span class="skill-tag">Python</span>
@@ -195,7 +172,8 @@
               <span class="skill-tag">Flutter</span>
             </div>
           </div>
-          <div class="skill-category">
+
+          <div class="skill-category" data-reveal="fade-up" data-delay="80">
             <h3>Hardware &amp; Design</h3>
             <div class="skill-items">
               <span class="skill-tag">Circuit Design</span>
@@ -203,7 +181,8 @@
               <span class="skill-tag">KiCAD</span>
             </div>
           </div>
-          <div class="skill-category">
+
+          <div class="skill-category" data-reveal="fade-up" data-delay="160">
             <h3>Software &amp; Tools</h3>
             <div class="skill-items">
               <span class="skill-tag">MATLAB-SIMULINK</span>
@@ -211,7 +190,8 @@
               <span class="skill-tag">Machine Learning</span>
             </div>
           </div>
-          <div class="skill-category">
+
+          <div class="skill-category" data-reveal="fade-up" data-delay="240">
             <h3>Development</h3>
             <div class="skill-items">
               <span class="skill-tag">Cross-platform Apps</span>
@@ -219,7 +199,8 @@
               <span class="skill-tag">Data Analysis</span>
             </div>
           </div>
-          <div class="skill-category">
+
+          <div class="skill-category" data-reveal="fade-up" data-delay="320">
             <h3>Security</h3>
             <div class="skill-items">
               <span class="skill-tag">Cybersecurity</span>
@@ -227,18 +208,17 @@
               <span class="skill-tag">Vulnerability Assessment</span>
             </div>
           </div>
+
         </div>
       </div>
     </section>
 
-    <!-- ============================================================ -->
-    <!-- PROJECTS SECTION — Featured + Auto GitHub + Working On       -->
-    <!-- ============================================================ -->
+    <!-- ═══════════════ PROJECTS ═══════════════ -->
     <section id="projects" class="projects">
       <div class="container">
 
-        <!-- ⭐ FEATURED PROJECTS (manual, curated) -->
-        <div class="projects-sub-header">
+        <!-- ⭐ Featured -->
+        <div class="projects-sub-header" data-reveal="fade-up">
           <span class="projects-sub-label featured-label">
             <span class="material-icons">star</span> Featured Projects
           </span>
@@ -246,103 +226,86 @@
         </div>
         <div class="projects-grid featured-grid">
 
-          <!-- Featured 1: Trash Nada -->
-          <div class="project-card featured-card">
+          <div class="project-card featured-card" data-reveal="fade-up" data-delay="0">
             <div class="project-icon">
               <span class="material-icons">recycling</span>
             </div>
             <h3>Trash Nada</h3>
             <p>
-              AI-driven waste management system that ranked among the top 10 at
-              the Satwa National Hackathon (133 teams). Utilizes machine learning
-              algorithms to optimise waste sorting and disposal processes.
+              AI-driven waste management system ranked top 10 at the Satwa National Hackathon (133
+              teams). Uses machine learning to optimise waste sorting and disposal processes.
             </p>
             <div class="project-tags">
               <span class="tag">AI/ML</span>
               <span class="tag">Python</span>
               <span class="tag">Sustainability</span>
             </div>
-            <div class="project-links" style="margin-top:1rem">
-              <a
-                href="https://drive.google.com/drive/folders/19JhuGT66JVEsUgpoyN4sNFAIDtkcsEpi?usp=drive_link"
-                class="btn btn-secondary"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+            <div style="margin-top:1rem">
+              <a href="https://drive.google.com/drive/folders/19JhuGT66JVEsUgpoyN4sNFAIDtkcsEpi?usp=drive_link"
+                 class="btn btn-secondary" target="_blank" rel="noopener">
                 <span class="material-icons">folder_open</span>
                 View Demo &amp; Presentation
               </a>
             </div>
           </div>
 
-          <!-- Featured 2: Orbital Dodge -->
-          <div class="project-card featured-card">
+          <div class="project-card featured-card" data-reveal="fade-up" data-delay="100">
             <div class="project-icon">
               <span class="material-icons">sports_esports</span>
             </div>
             <h3>Orbital Dodge Game</h3>
             <p>
-              A fast-paced arcade game built with JavaScript and enhanced with
-              the Gemini API for dynamic, AI-generated content. Dodge projectiles
-              and survive as the difficulty ramps up.
+              Fast-paced arcade game built with JavaScript and enhanced with the Gemini API for
+              dynamic AI-generated content. Dodge projectiles as difficulty ramps up.
             </p>
             <div class="project-tags">
               <span class="tag">JavaScript</span>
               <span class="tag">Gemini API</span>
               <span class="tag">Game Dev</span>
             </div>
-            <div class="project-links" style="margin-top:1rem">
-              <a href="orbital-dodge.html" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+            <div style="margin-top:1rem">
+              <a href="orbital-dodge.html" class="btn btn-secondary" target="_blank" rel="noopener">
                 <span class="material-icons">rocket_launch</span>
                 Play Game
               </a>
             </div>
           </div>
 
-          <!-- Featured 3: Not_KTU Website -->
-          <div class="project-card featured-card">
+          <div class="project-card featured-card" data-reveal="fade-up" data-delay="200">
             <div class="project-icon">
               <span class="material-icons">web</span>
             </div>
             <h3>Not_KTU Website</h3>
             <p>
-              A student-focused web platform designed as an alternative academic
-              resource hub for KTU students. Built with clean UI and practical
-              utility in mind to make student life easier.
+              A student-focused web platform designed as an alternative academic resource hub for KTU
+              students — clean UI, practical utility, built to make student life easier.
             </p>
             <div class="project-tags">
               <span class="tag">Web Dev</span>
               <span class="tag">HTML/CSS</span>
               <span class="tag">JavaScript</span>
             </div>
-            <div class="project-links" style="margin-top:1rem">
-              <a
-                href="https://github.com/aswin-m-kumar/Not_KTU_Results.git"
-                class="btn btn-secondary"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+            <div style="margin-top:1rem">
+              <a href="https://github.com/aswin-m-kumar" class="btn btn-secondary" target="_blank" rel="noopener">
                 <span class="material-icons">open_in_new</span>
                 View on GitHub
               </a>
             </div>
           </div>
 
-        </div><!-- /featured-grid -->
+        </div>
 
-        <!-- 🔄 AUTO GITHUB PROJECTS (loaded dynamically) -->
-        <div class="projects-sub-header" style="margin-top:3.5rem">
+        <!-- 🔄 Auto GitHub -->
+        <div class="projects-sub-header" style="margin-top:3.5rem" data-reveal="fade-up">
           <span class="projects-sub-label auto-label">
             <span class="material-icons">sync</span> Other Projects
           </span>
           <p class="projects-sub-desc">Pulled live from my GitHub — always up to date</p>
         </div>
-        <div class="projects-grid" id="auto-projects-container">
-          <!-- Cards injected by script.js loadProjects() -->
-        </div>
+        <div class="projects-grid" id="auto-projects-container"></div>
 
-        <!-- 🚀 CURRENTLY WORKING ON -->
-        <div class="currently-working-banner">
+        <!-- 🚀 Currently Working On -->
+        <div class="currently-working-banner" data-reveal="fade-up" data-delay="120">
           <div class="cwb-icon">
             <span class="material-icons">construction</span>
           </div>
@@ -350,7 +313,9 @@
             <span class="cwb-label">Currently Working On</span>
             <h3 class="cwb-title">Solar PV + MPPT Simulation</h3>
             <p class="cwb-desc">
-              Modelling and simulating a Solar Photovoltaic system with Maximum Power Point Tracking (MPPT) algorithms in MATLAB/Simulink — exploring Perturb &amp; Observe and Incremental Conductance methods to maximise energy harvest efficiency.
+              Modelling and simulating a Solar Photovoltaic system with Maximum Power Point Tracking
+              (MPPT) algorithms in MATLAB/Simulink — exploring Perturb &amp; Observe and Incremental
+              Conductance methods to maximise energy harvest efficiency.
             </p>
           </div>
           <div class="cwb-status">
@@ -360,98 +325,106 @@
         </div>
 
       </div>
-    </section><!-- /projects -->
+    </section>
 
-    <!-- Fun Zone Section -->
+    <!-- ═══════════════ FUN ZONE ═══════════════ -->
     <section id="fun-zone" class="fun-zone-section">
       <div class="container">
-        <h2 class="section-title">Fun Zone</h2>
-        <p class="section-description">
+        <h2 class="section-title" data-reveal="fade-up">Fun Zone</h2>
+        <p class="section-description" data-reveal="fade-up" data-delay="80">
           I enjoy building interactive projects. Take a break and try one of my games!
         </p>
-        <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;">
+        <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;"
+             data-reveal="zoom" data-delay="160">
           <a href="game.html" class="btn btn-primary">
-            Play Circuit Master
-            <span class="material-icons">memory</span>
+            Play Circuit Master <span class="material-icons">memory</span>
           </a>
           <a href="orbital-dodge.html" class="btn btn-primary">
-            Play Orbital Dodge
-            <span class="material-icons">rocket_launch</span>
+            Play Orbital Dodge <span class="material-icons">rocket_launch</span>
           </a>
         </div>
       </div>
     </section>
 
-    <!-- Certificates Section -->
+    <!-- ═══════════════ CERTIFICATES ═══════════════ -->
     <section id="certificates" class="certificates">
       <div class="container">
-        <h2 class="section-title">Certificates &amp; Achievements</h2>
-        <p class="section-description">
+        <h2 class="section-title" data-reveal="fade-up">Certificates &amp; Achievements</h2>
+        <p class="section-description" data-reveal="fade-up" data-delay="60">
           A collection of my certifications and achievements that mark my journey in technology and engineering.
         </p>
         <div class="certificates-grid">
-          <div class="certificate-card">
+
+          <div class="certificate-card" data-reveal="fade-up" data-delay="0">
             <div class="certificate-icon"><span class="material-icons">psychology</span></div>
             <h3>Google AI Essentials</h3>
             <p>Completed the Google course on the fundamentals of Artificial Intelligence, offered through Coursera.</p>
             <a href="https://drive.google.com/file/d/1XH95VlZGtW1qX0WMPSmo5Y0-3Vsj2h27/view?usp=drive_link" class="btn btn-secondary" target="_blank">View Certificate</a>
           </div>
-          <div class="certificate-card">
+
+          <div class="certificate-card" data-reveal="fade-up" data-delay="60">
             <div class="certificate-icon"><span class="material-icons">question_answer</span></div>
             <h3>Google Prompting Essentials</h3>
-            <p>Mastered the art of prompt engineering with the Google course on Prompting Essentials, offered through Coursera.</p>
+            <p>Mastered prompt engineering with the Google Prompting Essentials course, offered through Coursera.</p>
             <a href="https://drive.google.com/file/d/16WuhLHdLPpUwr1I1Mi47130o_cGQ4kNP/view?usp=drive_link" class="btn btn-secondary" target="_blank">View Certificate</a>
           </div>
-          <div class="certificate-card">
+
+          <div class="certificate-card" data-reveal="fade-up" data-delay="120">
             <div class="certificate-icon"><span class="material-icons">calculate</span></div>
             <h3>MATLAB for Engineers</h3>
             <p>Participated in the national level "MATLAB for Engineers: An Experiential Learning" event by MIT Manipal.</p>
             <a href="https://drive.google.com/file/d/1ztU2xbAyzHbWd4mhXxM7CAk3t293SV9z/view?usp=drive_link" class="btn btn-secondary" target="_blank">View Certificate</a>
           </div>
-          <div class="certificate-card">
+
+          <div class="certificate-card" data-reveal="fade-up" data-delay="180">
             <div class="certificate-icon"><span class="material-icons">security</span></div>
             <h3>Cybersecurity Essentials</h3>
-            <p>Completed the Cisco Networking Academy course on Cybersecurity Essentials, covering key principles and practices.</p>
+            <p>Completed the Cisco Networking Academy Cybersecurity Essentials course, covering key principles and practices.</p>
             <a href="https://drive.google.com/file/d/125bHtkCZBUZTWanrzqMYLQXvw6aS4gw6/view?usp=drive_link" class="btn btn-secondary" target="_blank">View Certificate</a>
           </div>
-          <div class="certificate-card">
+
+          <div class="certificate-card" data-reveal="fade-up" data-delay="240">
             <div class="certificate-icon"><span class="material-icons">developer_board</span></div>
             <h3>PCB Design Workshop</h3>
             <p>Completed a hands-on workshop by IET On Campus CET, mastering circuit design and fabrication using KiCAD.</p>
             <a href="https://drive.google.com/file/d/1oR-cLRyv_pK3otTyAIQInyUAUkdChHQB/view?usp=drive_link" class="btn btn-secondary" target="_blank">View Certificate</a>
           </div>
-          <div class="certificate-card">
+
+          <div class="certificate-card" data-reveal="fade-up" data-delay="300">
             <div class="certificate-icon"><span class="material-icons">precision_manufacturing</span></div>
             <h3>Bosch Training Program</h3>
             <p>Gained practical experience with industrial machinery, automation systems, and PLC software at Bosch.</p>
             <a href="https://drive.google.com/file/d/1z7a3pIMueiNxvtiMIBLRiytNWSpuqDDq/view?usp=drive_link" class="btn btn-secondary" target="_blank">View Certificate</a>
           </div>
-          <div class="certificate-card">
+
+          <div class="certificate-card" data-reveal="fade-up" data-delay="360">
             <div class="certificate-icon"><span class="material-icons">emoji_events</span></div>
             <h3>Satwa 25 Hackathon Finalist</h3>
             <p>Recognised as a top 10 finalist among 133 teams for the 'Trash Nada' AI-powered waste management project.</p>
             <a href="https://drive.google.com/file/d/1n-8w0P4w0P-UY53uvlQMBI14dpOIlngn/view?usp=drive_link" class="btn btn-secondary" target="_blank">View Certificate</a>
           </div>
-          <div class="certificate-card">
+
+          <div class="certificate-card" data-reveal="fade-up" data-delay="420">
             <div class="certificate-icon"><span class="material-icons">campaign</span></div>
             <h3>Dhwani'24 Publicity Team</h3>
             <p>Certificate of appreciation for my role in the publicity team for the Dhwani'24 cultural fest at CET.</p>
             <a href="https://drive.google.com/file/d/1z5o518PY9bGLXzXfYCwvAGJASZHowvxk/view?usp=drive_link" class="btn btn-secondary" target="_blank">View Certificate</a>
           </div>
+
         </div>
       </div>
     </section>
 
-    <!-- Contact Section -->
+    <!-- ═══════════════ CONTACT ═══════════════ -->
     <section id="contact" class="contact">
       <div class="container">
-        <h2 class="section-title">Get In Touch</h2>
-        <p class="section-description">
-          I'm always open to discussing new opportunities, collaborations, or
-          just having a chat about technology!
+        <h2 class="section-title" data-reveal="fade-up">Get In Touch</h2>
+        <p class="section-description" data-reveal="fade-up" data-delay="60">
+          I'm always open to discussing new opportunities, collaborations, or just a chat about technology!
         </p>
         <div class="contact-grid">
-          <div class="contact-info">
+
+          <div class="contact-info" data-reveal="fade-left" data-delay="100">
             <div class="contact-item">
               <span class="material-icons">email</span>
               <div>
@@ -487,12 +460,9 @@
               </div>
             </div>
           </div>
-          <div class="contact-form">
-            <form
-              id="contactForm"
-              action="https://formspree.io/f/mvgqbrko"
-              method="POST"
-            >
+
+          <div class="contact-form" data-reveal="fade-right" data-delay="100">
+            <form id="contactForm" action="https://formspree.io/f/mvgqbrko" method="POST">
               <div class="form-group">
                 <input type="text" id="contactName" name="name" placeholder="Your Name" required />
               </div>
@@ -500,25 +470,18 @@
                 <input type="email" id="contactEmail" name="email" placeholder="Your Email" required />
               </div>
               <div class="form-group">
-                <textarea
-                  id="contactMessage"
-                  name="message"
-                  placeholder="Your Message"
-                  rows="5"
-                  required
-                ></textarea>
+                <textarea id="contactMessage" name="message" placeholder="Your Message" rows="5" required></textarea>
               </div>
-              <button type="submit" id="contactSubmitBtn" class="btn btn-primary">
-                Send Message
-              </button>
+              <button type="submit" id="contactSubmitBtn" class="btn btn-primary">Send Message</button>
               <div id="form-response" class="form-response"></div>
             </form>
           </div>
+
         </div>
       </div>
     </section>
 
-    <!-- Footer -->
+    <!-- ═══════════════ FOOTER ═══════════════ -->
     <footer class="footer">
       <div class="container">
         <p>&copy; 2025 Aswin M Kumar. Built with passion and code.</p>
