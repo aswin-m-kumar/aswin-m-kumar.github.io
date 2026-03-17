@@ -1,114 +1,267 @@
-/* experience.css */
+/* experience.css — Phase 3 redesign */
 
-/* --- PAGE STRUCTURE --- */
+/* ============================================================
+   PAGE STRUCTURE
+   ============================================================ */
 .experience-page {
-  padding-top: 120px; /* Space for fixed navbar */
-  padding-bottom: 4rem;
-  background-color: var(--bg-secondary);
+  padding-top: 110px;
+  padding-bottom: 5rem;
+  background: var(--bg);
   min-height: 100vh;
-}
-
-.logo-link {
-  text-decoration: none;
-}
-
-/* --- EXPERIENCE GRID --- */
-.experience-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2.5rem;
-  margin-top: 3rem;
-}
-
-/* --- EXPERIENCE CARD --- */
-.experience-card {
-  background: var(--surface);
-  border-radius: 20px;
-  box-shadow: 0 10px 30px var(--shadow-color);
+  position: relative;
   overflow: hidden;
+}
+
+/* Background orbs matching hero */
+.experience-page::before,
+.experience-page::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+}
+.experience-page::before {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(99,102,241,0.13) 0%, transparent 70%);
+  top: -100px; right: -80px;
+  animation: orbDrift 14s ease-in-out infinite alternate;
+}
+.experience-page::after {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(6,182,212,0.10) 0%, transparent 70%);
+  bottom: 60px; left: -60px;
+  animation: orbDrift 18s ease-in-out infinite alternate-reverse;
+}
+@keyframes orbDrift {
+  0%   { transform: translate(0,0); }
+  100% { transform: translate(24px, 36px); }
+}
+
+.experience-page .container {
+  position: relative; z-index: 1;
+}
+
+/* Page header */
+.exp-page-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+.exp-page-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700; line-height: 1.2; margin-bottom: 0.75rem;
+  background: var(--grad);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.exp-page-subtitle {
+  font-size: 1.05rem; color: var(--text2); max-width: 520px; margin: 0 auto;
+}
+
+/* ============================================================
+   STATS ROW
+   ============================================================ */
+.exp-stats-row {
+  display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+  margin-bottom: 4rem;
+}
+.exp-stat-pill {
+  display: flex; align-items: center; gap: 0.65rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 50px; padding: 0.65rem 1.4rem;
+  box-shadow: 0 4px 16px var(--shadow);
+  transition: transform 0.28s, box-shadow 0.28s;
+}
+.exp-stat-pill:hover { transform: translateY(-4px); box-shadow: 0 10px 28px var(--shadow-h); }
+.exp-stat-pill .material-icons { color: var(--primary); font-size: 1.3rem; }
+.exp-stat-num   { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+.exp-stat-label { font-size: 0.8rem; color: var(--text3); font-weight: 500; }
+
+/* ============================================================
+   TIMELINE LAYOUT
+   ============================================================ */
+.timeline {
+  position: relative;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Central spine */
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    var(--primary) 8%,
+    var(--primary) 92%,
+    transparent 100%);
+  transform: translateX(-50%);
+  opacity: 0.25;
+}
+
+/* Individual timeline item */
+.timeline-item {
   display: flex;
-  flex-direction: column;
-  transition: transform 0.3s, box-shadow 0.3s;
+  justify-content: flex-end;
+  padding-right: calc(50% + 2.5rem);
+  margin-bottom: 3rem;
+  position: relative;
+}
+.timeline-item:nth-child(even) {
+  justify-content: flex-start;
+  padding-right: 0;
+  padding-left: calc(50% + 2.5rem);
 }
 
-.experience-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 40px var(--shadow-hover);
+/* Dot on the spine */
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 1.6rem;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
+  transform: translateX(-50%);
+  z-index: 1;
+  transition: box-shadow 0.3s;
+}
+.timeline-item:hover::before {
+  box-shadow: 0 0 0 6px rgba(99,102,241,0.18);
 }
 
-.experience-image img {
+/* ============================================================
+   EXPERIENCE CARD (glassmorphism)
+   ============================================================ */
+.exp-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 6px 24px var(--shadow);
+  overflow: hidden;
+  transition: transform 0.32s cubic-bezier(0.16,1,0.3,1), box-shadow 0.32s;
   width: 100%;
-  height: 250px;
-  object-fit: cover;
-  display: block;
+  position: relative;
+}
+/* Gradient top bar — colour per category */
+.exp-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: var(--grad);
+}
+.exp-card.color-purple::before { background: linear-gradient(135deg,#6366f1,#8b5cf6); }
+.exp-card.color-cyan::before   { background: linear-gradient(135deg,#06b6d4,#0ea5e9); }
+.exp-card.color-green::before  { background: linear-gradient(135deg,#10b981,#059669); }
+.exp-card.color-orange::before { background: linear-gradient(135deg,#f59e0b,#f97316); }
+.exp-card.color-pink::before   { background: linear-gradient(135deg,#ec4899,#db2777); }
+.exp-card.color-blue::before   { background: linear-gradient(135deg,#3b82f6,#2563eb); }
+.exp-card.color-red::before    { background: linear-gradient(135deg,#ef4444,#dc2626); }
+
+.exp-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 18px 48px var(--shadow-h);
 }
 
-.experience-content {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
+/* Card header row */
+.exp-card-header {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1.5rem 1.75rem 1rem;
+}
+.exp-card-icon {
+  width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  background: var(--grad);
+}
+.exp-card.color-purple .exp-card-icon { background: linear-gradient(135deg,#6366f1,#8b5cf6); }
+.exp-card.color-cyan   .exp-card-icon { background: linear-gradient(135deg,#06b6d4,#0ea5e9); }
+.exp-card.color-green  .exp-card-icon { background: linear-gradient(135deg,#10b981,#059669); }
+.exp-card.color-orange .exp-card-icon { background: linear-gradient(135deg,#f59e0b,#f97316); }
+.exp-card.color-pink   .exp-card-icon { background: linear-gradient(135deg,#ec4899,#db2777); }
+.exp-card.color-blue   .exp-card-icon { background: linear-gradient(135deg,#3b82f6,#2563eb); }
+.exp-card.color-red    .exp-card-icon { background: linear-gradient(135deg,#ef4444,#dc2626); }
+
+.exp-card-icon .material-icons { color: #fff; font-size: 1.5rem; }
+.exp-card-titles { flex: 1; min-width: 0; }
+.exp-card-org  { font-size: 1.15rem; font-weight: 700; color: var(--text); line-height: 1.3; }
+.exp-card-role { font-size: 0.9rem; color: var(--primary); font-weight: 600; margin-top: 0.15rem; }
+
+/* Duration badge */
+.exp-card-duration {
+  flex-shrink: 0;
+  background: var(--surface2); color: var(--text3);
+  font-size: 0.75rem; font-weight: 600;
+  padding: 0.25rem 0.7rem; border-radius: 20px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
 }
 
-.experience-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
+/* Card body */
+.exp-card-body { padding: 0 1.75rem 1.75rem; }
+.exp-card-desc {
+  color: var(--text2); font-size: 0.95rem; line-height: 1.7;
+  margin-bottom: 1.1rem;
 }
 
-.experience-role {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--primary-color);
-  margin-bottom: 1rem;
+/* Tags */
+.exp-card-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.exp-tag {
+  background: var(--surface2); color: var(--text2);
+  padding: 0.22rem 0.7rem; border-radius: 14px;
+  font-size: 0.78rem; font-weight: 500;
+  border: 1px solid var(--border);
+  transition: background 0.2s, color 0.2s;
+}
+.exp-card:hover .exp-tag {
+  background: rgba(99,102,241,0.08);
+  color: var(--primary);
+  border-color: rgba(99,102,241,0.25);
 }
 
-.experience-description {
-  color: var(--text-secondary);
-  line-height: 1.7;
-  flex-grow: 1;
-  margin-bottom: 1.5rem;
-  text-align: left;
+/* ============================================================
+   SCROLL REVEAL (reuse Phase 2 system)
+   ============================================================ */
+/* Already defined in styles.css — no duplication needed */
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 760px) {
+  /* Stack timeline to single column */
+  .timeline::before { left: 20px; transform: none; }
+
+  .timeline-item,
+  .timeline-item:nth-child(even) {
+    justify-content: flex-start;
+    padding-left: 3.5rem;
+    padding-right: 0;
+  }
+  .timeline-item::before,
+  .timeline-item:nth-child(even)::before {
+    left: 14px; transform: none;
+  }
+
+  .exp-stats-row { gap: 0.75rem; }
+  .exp-stat-pill { padding: 0.5rem 1rem; }
 }
 
-.experience-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: auto; /* Pushes tags to the bottom */
+@media (max-width: 480px) {
+  .exp-card-header { flex-wrap: wrap; }
+  .exp-card-duration { align-self: flex-start; }
+  .experience-page { padding-top: 90px; }
 }
 
-/* --- RESPONSIVE DESIGN --- */
-@media (min-width: 768px) {
-  .experience-card {
-    flex-direction: row;
-    align-items: stretch;
-  }
-
-  .experience-image {
-    flex: 0 0 40%;
-    min-width: 300px;
-  }
-  
-  .experience-image img {
-    height: 100%;
-  }
-
-  .experience-content {
-    flex: 1;
-    padding: 2rem;
-  }
-}
-
-@media (max-width: 600px) {
-  .experience-page {
-    padding-top: 100px;
-  }
-  .experience-title {
-    font-size: 1.5rem;
-  }
-  .experience-content {
-    padding: 1.5rem;
-  }
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .experience-page::before,
+  .experience-page::after { animation: none; }
+  .exp-card { transition: none; }
 }

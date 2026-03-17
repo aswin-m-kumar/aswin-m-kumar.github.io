@@ -248,6 +248,9 @@ document.addEventListener('DOMContentLoaded', function () {
         card.className = 'project-card auto-project-card';
         card.setAttribute('data-reveal', 'fade-up');
         card.setAttribute('data-delay', String(idx * 90));
+        // Store topics + language for client-side filtering
+        card.dataset.topics = (repo.topics || []).join(',').toLowerCase();
+        card.dataset.lang   = (repo.language || '').toLowerCase();
 
         const lang = getLangColor(repo.language);
         const date = new Date(repo.updated_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -303,7 +306,53 @@ document.addEventListener('DOMContentLoaded', function () {
     return m[lang] || m.default;
   }
 
-  loadProjects();
+  loadProjects().then(() => initTopicFilter());
+
+  // ============================================================
+  // ★ TOPIC TAG FILTER
+  // ============================================================
+  const FILTER_MAP = {
+    ai:       ['ai', 'ml', 'machine-learning', 'deep-learning', 'computer-vision', 'nlp', 'tensorflow', 'pytorch'],
+    iot:      ['iot', 'esp32', 'arduino', 'raspberry-pi', 'sensors', 'mqtt'],
+    embedded: ['embedded', 'embedded-systems', 'firmware', 'rtos', 'stm32', 'microcontroller', 'c', 'arm'],
+    flutter:  ['flutter', 'dart', 'mobile', 'android', 'ios', 'app'],
+    web:      ['web', 'html', 'css', 'javascript', 'react', 'nodejs', 'frontend'],
+  };
+
+  function initTopicFilter() {
+    const btns = document.querySelectorAll('.topic-filter-btn');
+    if (!btns.length) return;
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        btns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterProjects(btn.dataset.filter);
+      });
+    });
+  }
+
+  function filterProjects(filter) {
+    const cards = document.querySelectorAll('#auto-projects-container .auto-project-card');
+    const allowed = filter === 'all' ? null : (FILTER_MAP[filter] || []);
+    cards.forEach(card => {
+      if (!allowed) { card.style.display = ''; return; }
+      const topics = (card.dataset.topics || '').toLowerCase().split(',');
+      const lang   = (card.dataset.lang   || '').toLowerCase();
+      card.style.display = allowed.some(kw => topics.includes(kw) || lang.includes(kw)) ? '' : 'none';
+    });
+    const container = document.getElementById('auto-projects-container');
+    const existing  = container.querySelector('.filter-empty');
+    if (existing) existing.remove();
+    const visible = [...cards].filter(c => c.style.display !== 'none');
+    if (visible.length === 0 && filter !== 'all') {
+      const msg = document.createElement('div');
+      msg.className = 'filter-empty no-projects-msg';
+      msg.innerHTML = `<span class="material-icons">filter_list_off</span>
+        <p>No repos tagged <strong>${filter}</strong> yet.
+        <a href="https://github.com/aswin-m-kumar" target="_blank">Add topics on GitHub →</a></p>`;
+      container.appendChild(msg);
+    }
+  }
 
   // ============================================================
   // CONTACT FORM

@@ -3,182 +3,307 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Experience - Aswin M Kumar</title>
+    <title>Experience — Aswin M Kumar</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="experience.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   </head>
   <body>
-    <!-- Navigation -->
+
+    <!-- ═══════════════ NAVIGATION ═══════════════ -->
     <nav class="navbar">
       <div class="nav-container">
         <div class="nav-logo">
-          <a href="index.html" class="logo-link">
+          <a href="index.html" style="text-decoration:none;">
             <span class="logo-text">Aswin M Kumar</span>
           </a>
         </div>
         <div class="nav-menu">
-          <a href="index.html" class="nav-link">
-            <span class="material-icons">arrow_back</span>
-            Back to Home
-          </a>
+          <a href="index.html#about"        class="nav-link">About</a>
+          <a href="index.html#skills"       class="nav-link">Skills</a>
+          <a href="index.html#projects"     class="nav-link">Projects</a>
+          <a href="index.html#certificates" class="nav-link">Certificates</a>
+          <a href="index.html#contact"      class="nav-link">Contact</a>
+          <button class="theme-toggle" id="themeToggle">
+            <span class="material-icons">light_mode</span>
+          </button>
+        </div>
+        <div class="hamburger" id="hamburger">
+          <span></span><span></span><span></span>
         </div>
       </div>
     </nav>
 
-    <!-- Experience Section -->
+    <!-- ═══════════════ MAIN ═══════════════ -->
     <main class="experience-page">
       <div class="container">
-        <h1 class="section-title">Internships & Programs</h1>
-        <p class="section-description">
-          A detailed look at my hands-on experience, training programs, and significant roles.
-        </p>
 
-        <div class="experience-grid">
-          <!-- Experience Card 1: Bosch -->
-          <div class="experience-card">
-            <div class="experience-image">
-              <img src="https://placehold.co/600x400/6366f1/white?text=Bosch" alt="Bosch Training Program" />
-            </div>
-            <div class="experience-content">
-              <h2 class="experience-title">Bosch Training Program</h2>
-              <h3 class="experience-role">Trainee</h3>
-              <p class="experience-description">
-                Gained hands-on experience with industrial machinery and PLC software. Learned automation system principles and programming in a professional environment.
-              </p>
-              <div class="experience-tags">
-                <span class="tag">PLC Programming</span>
-                <span class="tag">Industrial Automation</span>
-                <span class="tag">Machinery</span>
-              </div>
-            </div>
+        <!-- Page header -->
+        <div class="exp-page-header" data-reveal="fade-up">
+          <div style="display:flex;justify-content:center;margin-bottom:1rem;">
+            <a href="index.html" class="btn btn-ghost" style="font-size:0.88rem;padding:0.4rem 1rem;">
+              <span class="material-icons" style="font-size:1rem">arrow_back</span>
+              Back to Home
+            </a>
           </div>
-
-          <!-- Experience Card 2: SAEINDIA -->
-          <div class="experience-card">
-            <div class="experience-image">
-              <img src="https://placehold.co/600x400/8b5cf6/white?text=SAEINDIA" alt="SAEINDIA CET" />
-            </div>
-            <div class="experience-content">
-              <h2 class="experience-title">SAEINDIA, College of Engineering Trivandrum</h2>
-              <h3 class="experience-role">Membership Coordinator</h3>
-              <p class="experience-description">
-                Facilitated SAEINDIA membership for Herackles Racing CET and Zenith Motorsport CET for BAJA SAEINDIA 2026. Coordinated with teams and officials to ensure compliance and streamline enrollment.
-              </p>
-              <div class="experience-tags">
-                <span class="tag">Coordination</span>
-                <span class="tag">Team Management</span>
-                <span class="tag">Automotive</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Experience Card 3: Evolve Racing -->
-          <div class="experience-card">
-            <div class="experience-image">
-              <img src="https://placehold.co/600x400/06b6d4/white?text=Evolve+Racing" alt="Evolve Racing CET" />
-            </div>
-            <div class="experience-content">
-              <h2 class="experience-title">Evolve Racing, College of Engineering Trivandrum</h2>
-              <h3 class="experience-role">Technical Team (Suspension & Steering)</h3>
-              <p class="experience-description">
-                Designed and optimized suspension and steering system components for a formula-style racing vehicle using SolidWorks. Collaborated with the team to improve vehicle performance and handling.
-              </p>
-              <div class="experience-tags">
-                <span class="tag">SolidWorks</span>
-                <span class="tag">Mechanical Design</span>
-                <span class="tag">Team Collaboration</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Experience Card 4: Delta Automations -->
-          <div class="experience-card">
-            <div class="experience-image">
-              <img src="https://placehold.co/600x400/10b981/white?text=Delta+Automations" alt="Delta Automations" />
-            </div>
-            <div class="experience-content">
-              <h2 class="experience-title">Delta Automations</h2>
-              <h3 class="experience-role">Technical Team Member</h3>
-              <p class="experience-description">
-                Contributed to a project on agricultural technology by helping train a machine learning model for automated weed detection from crop fields.
-              </p>
-              <div class="experience-tags">
-                <span class="tag">Machine Learning</span>
-                <span class="tag">AI</span>
-                <span class="tag">AgriTech</span>
-                <span class="tag">Python</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Experience Card 5: Keltron Internship -->
-          <div class="experience-card">
-            <div class="experience-image">
-              <img src="https://placehold.co/600x400/f97316/white?text=Keltron" alt="Keltron Internship" />
-            </div>
-            <div class="experience-content">
-              <h2 class="experience-title">Keltron Internship</h2>
-              <h3 class="experience-role">IoT Intern (2 Weeks)</h3>
-              <p class="experience-description">
-                Completed a 2-week internship focused on the Internet of Things (IoT), gaining practical experience with sensors, microcontrollers, and data communication protocols.
-              </p>
-              <div class="experience-tags">
-                <span class="tag">IoT</span>
-                <span class="tag">Internship</span>
-                <span class="tag">Electronics</span>
-                <span class="tag">Sensors</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Experience Card 6: IET Drone Workshop -->
-          <div class="experience-card">
-            <div class="experience-image">
-              <img src="https://placehold.co/600x400/3b82f6/white?text=IET+Workshop" alt="IET Drone Workshop" />
-            </div>
-            <div class="experience-content">
-              <h2 class="experience-title">IET Drone Workshop</h2>
-              <h3 class="experience-role">Participant</h3>
-              <p class="experience-description">
-                Successfully completed a hands-on workshop on drone technology, covering assembly, programming, and flight operations, organized by the IET and NIT Calicut.
-              </p>
-              <div class="experience-tags">
-                <span class="tag">Drones</span>
-                <span class="tag">IoT</span>
-                <span class="tag">Workshop</span>
-                <span class="tag">Hardware</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Experience Card 7: ASME CET -->
-          <div class="experience-card">
-            <div class="experience-image">
-              <img src="https://placehold.co/600x400/ec4899/white?text=ASME+CET" alt="ASME CET" />
-            </div>
-            <div class="experience-content">
-              <h2 class="experience-title">ASME, College of Engineering Trivandrum</h2>
-              <h3 class="experience-role">Publicity Team Member</h3>
-              <p class="experience-description">
-                Managed publicity and outreach for the American Society of Mechanical Engineers (ASME) chapter at CET, promoting events and activities to the college community.
-              </p>
-              <div class="experience-tags">
-                <span class="tag">Publicity</span>
-                <span class="tag">Marketing</span>
-                <span class="tag">Community</span>
-              </div>
-            </div>
-          </div>
-
+          <h1 class="exp-page-title">Internships &amp; Experience</h1>
+          <p class="exp-page-subtitle">
+            Hands-on roles, training programs, and team positions that have shaped
+            my technical and collaborative skills.
+          </p>
         </div>
+
+        <!-- Stats row -->
+        <div class="exp-stats-row" data-reveal="fade-up" data-delay="80">
+          <div class="exp-stat-pill">
+            <span class="material-icons">work</span>
+            <span class="exp-stat-num">7</span>
+            <span class="exp-stat-label">Experiences</span>
+          </div>
+          <div class="exp-stat-pill">
+            <span class="material-icons">engineering</span>
+            <span class="exp-stat-num">3+</span>
+            <span class="exp-stat-label">Technical Roles</span>
+          </div>
+          <div class="exp-stat-pill">
+            <span class="material-icons">groups</span>
+            <span class="exp-stat-num">4</span>
+            <span class="exp-stat-label">Teams &amp; Orgs</span>
+          </div>
+          <div class="exp-stat-pill">
+            <span class="material-icons">emoji_events</span>
+            <span class="exp-stat-num">Top 10</span>
+            <span class="exp-stat-label">Hackathon</span>
+          </div>
+        </div>
+
+        <!-- ═══ TIMELINE ═══ -->
+        <div class="timeline">
+
+          <!-- 1: Bosch -->
+          <div class="timeline-item" data-reveal="fade-right" data-delay="0">
+            <div class="exp-card color-orange">
+              <div class="exp-card-header">
+                <div class="exp-card-icon">
+                  <span class="material-icons">precision_manufacturing</span>
+                </div>
+                <div class="exp-card-titles">
+                  <div class="exp-card-org">Bosch Training Program</div>
+                  <div class="exp-card-role">Trainee</div>
+                </div>
+                <span class="exp-card-duration">Industrial</span>
+              </div>
+              <div class="exp-card-body">
+                <p class="exp-card-desc">
+                  Gained hands-on experience with industrial machinery and PLC software in a
+                  professional automation environment. Learned the principles of automation system
+                  design and gained practical exposure to Bosch's industrial workflow standards.
+                </p>
+                <div class="exp-card-tags">
+                  <span class="exp-tag">PLC Programming</span>
+                  <span class="exp-tag">Industrial Automation</span>
+                  <span class="exp-tag">Machinery</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2: Keltron -->
+          <div class="timeline-item" data-reveal="fade-left" data-delay="60">
+            <div class="exp-card color-blue">
+              <div class="exp-card-header">
+                <div class="exp-card-icon">
+                  <span class="material-icons">sensors</span>
+                </div>
+                <div class="exp-card-titles">
+                  <div class="exp-card-org">Keltron</div>
+                  <div class="exp-card-role">IoT Intern</div>
+                </div>
+                <span class="exp-card-duration">2 Weeks</span>
+              </div>
+              <div class="exp-card-body">
+                <p class="exp-card-desc">
+                  Completed a focused 2-week internship on the Internet of Things — gaining practical
+                  experience with sensors, microcontrollers, and data communication protocols in a
+                  real industry setting at one of Kerala's leading electronics companies.
+                </p>
+                <div class="exp-card-tags">
+                  <span class="exp-tag">IoT</span>
+                  <span class="exp-tag">Electronics</span>
+                  <span class="exp-tag">Sensors</span>
+                  <span class="exp-tag">Microcontrollers</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3: Delta Automations -->
+          <div class="timeline-item" data-reveal="fade-right" data-delay="120">
+            <div class="exp-card color-green">
+              <div class="exp-card-header">
+                <div class="exp-card-icon">
+                  <span class="material-icons">agriculture</span>
+                </div>
+                <div class="exp-card-titles">
+                  <div class="exp-card-org">Delta Automations</div>
+                  <div class="exp-card-role">Technical Team Member</div>
+                </div>
+                <span class="exp-card-duration">AgriTech</span>
+              </div>
+              <div class="exp-card-body">
+                <p class="exp-card-desc">
+                  Contributed to an agricultural technology project by helping train a machine
+                  learning model for automated weed detection from crop field imagery — directly
+                  applying Python and computer vision to real-world farming challenges.
+                </p>
+                <div class="exp-card-tags">
+                  <span class="exp-tag">Machine Learning</span>
+                  <span class="exp-tag">AI</span>
+                  <span class="exp-tag">AgriTech</span>
+                  <span class="exp-tag">Python</span>
+                  <span class="exp-tag">Computer Vision</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4: Evolve Racing -->
+          <div class="timeline-item" data-reveal="fade-left" data-delay="180">
+            <div class="exp-card color-red">
+              <div class="exp-card-header">
+                <div class="exp-card-icon">
+                  <span class="material-icons">directions_car</span>
+                </div>
+                <div class="exp-card-titles">
+                  <div class="exp-card-org">Evolve Racing, CET</div>
+                  <div class="exp-card-role">Technical Team — Suspension &amp; Steering</div>
+                </div>
+                <span class="exp-card-duration">Motorsport</span>
+              </div>
+              <div class="exp-card-body">
+                <p class="exp-card-desc">
+                  Designed and optimised suspension and steering system components for a
+                  formula-style racing vehicle using SolidWorks. Collaborated closely with the
+                  team to improve vehicle performance, handling dynamics, and structural integrity.
+                </p>
+                <div class="exp-card-tags">
+                  <span class="exp-tag">SolidWorks</span>
+                  <span class="exp-tag">Mechanical Design</span>
+                  <span class="exp-tag">Suspension Systems</span>
+                  <span class="exp-tag">Team Collaboration</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5: SAEINDIA -->
+          <div class="timeline-item" data-reveal="fade-right" data-delay="240">
+            <div class="exp-card color-cyan">
+              <div class="exp-card-header">
+                <div class="exp-card-icon">
+                  <span class="material-icons">group_work</span>
+                </div>
+                <div class="exp-card-titles">
+                  <div class="exp-card-org">SAEINDIA, CET</div>
+                  <div class="exp-card-role">Membership Coordinator</div>
+                </div>
+                <span class="exp-card-duration">BAJA 2026</span>
+              </div>
+              <div class="exp-card-body">
+                <p class="exp-card-desc">
+                  Facilitated SAEINDIA membership for Herackles Racing CET and Zenith Motorsport CET
+                  for BAJA SAEINDIA 2026. Coordinated with teams and officials to ensure compliance
+                  and streamline the membership enrollment process.
+                </p>
+                <div class="exp-card-tags">
+                  <span class="exp-tag">Coordination</span>
+                  <span class="exp-tag">Team Management</span>
+                  <span class="exp-tag">Automotive</span>
+                  <span class="exp-tag">BAJA SAEINDIA</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6: IET Drone Workshop -->
+          <div class="timeline-item" data-reveal="fade-left" data-delay="300">
+            <div class="exp-card color-purple">
+              <div class="exp-card-header">
+                <div class="exp-card-icon">
+                  <span class="material-icons">flight</span>
+                </div>
+                <div class="exp-card-titles">
+                  <div class="exp-card-org">IET Drone Workshop</div>
+                  <div class="exp-card-role">Participant</div>
+                </div>
+                <span class="exp-card-duration">NIT Calicut</span>
+              </div>
+              <div class="exp-card-body">
+                <p class="exp-card-desc">
+                  Completed a hands-on workshop on drone technology organised by the IET and NIT
+                  Calicut, covering assembly, programming, and flight operations — bridging hardware
+                  knowledge with embedded software and flight control systems.
+                </p>
+                <div class="exp-card-tags">
+                  <span class="exp-tag">Drones</span>
+                  <span class="exp-tag">IoT</span>
+                  <span class="exp-tag">Hardware</span>
+                  <span class="exp-tag">Flight Control</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 7: ASME CET -->
+          <div class="timeline-item" data-reveal="fade-right" data-delay="360">
+            <div class="exp-card color-pink">
+              <div class="exp-card-header">
+                <div class="exp-card-icon">
+                  <span class="material-icons">campaign</span>
+                </div>
+                <div class="exp-card-titles">
+                  <div class="exp-card-org">ASME, CET</div>
+                  <div class="exp-card-role">Publicity Team Member</div>
+                </div>
+                <span class="exp-card-duration">On-Campus</span>
+              </div>
+              <div class="exp-card-body">
+                <p class="exp-card-desc">
+                  Managed publicity and outreach for the American Society of Mechanical Engineers
+                  (ASME) chapter at CET — promoting events and activities to the college community
+                  and building the chapter's presence on campus.
+                </p>
+                <div class="exp-card-tags">
+                  <span class="exp-tag">Publicity</span>
+                  <span class="exp-tag">Marketing</span>
+                  <span class="exp-tag">Community</span>
+                  <span class="exp-tag">ASME</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /timeline -->
+
+        <!-- Bottom CTA -->
+        <div style="text-align:center;margin-top:4rem;" data-reveal="fade-up">
+          <p style="color:var(--text3);font-size:0.95rem;margin-bottom:1.25rem;">
+            Want to work together or know more?
+          </p>
+          <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;">
+            <a href="index.html#contact" class="btn btn-primary">
+              <span class="material-icons">mail_outline</span>
+              Get In Touch
+            </a>
+            <a href="https://aswin-m-kumar.github.io/resume/Aswin_M_Kumar-Resume.pdf"
+               class="btn btn-secondary" target="_blank" rel="noopener">
+              <span class="material-icons">description</span>
+              Download Resume
+            </a>
+          </div>
+        </div>
+
       </div>
     </main>
 
@@ -188,5 +313,98 @@
         <p>&copy; 2025 Aswin M Kumar. Built with passion and code.</p>
       </div>
     </footer>
+
+    <script>
+    // Minimal script — reuse Phase 2 scroll reveal + theme toggle
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // Theme toggle
+      const toggle = document.getElementById('themeToggle');
+      const body   = document.body;
+      const icon   = toggle.querySelector('.material-icons');
+      const saved  = localStorage.getItem('theme') || 'light';
+      body.setAttribute('data-theme', saved);
+      icon.textContent = saved === 'dark' ? 'light_mode' : 'dark_mode';
+
+      toggle.addEventListener('click', () => {
+        const next = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        body.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        icon.textContent = next === 'dark' ? 'light_mode' : 'dark_mode';
+        toggle.style.transform = 'rotate(360deg)';
+        setTimeout(() => toggle.style.transform = '', 350);
+      });
+
+      // Hamburger
+      const ham  = document.getElementById('hamburger');
+      const menu = document.querySelector('.nav-menu');
+      ham.addEventListener('click', () => {
+        ham.classList.toggle('active');
+        menu.classList.toggle('active');
+      });
+
+      // Navbar scroll
+      const navbar = document.querySelector('.navbar');
+      window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 60);
+        const dark = body.getAttribute('data-theme') === 'dark';
+        navbar.style.background = window.scrollY > 60
+          ? (dark ? 'rgba(15,23,42,0.98)' : 'rgba(255,255,255,0.98)')
+          : (dark ? 'rgba(15,23,42,0.82)' : 'rgba(255,255,255,0.82)');
+      });
+
+      // Scroll reveal (same IntersectionObserver as Phase 2)
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (!e.isIntersecting) return;
+          const el = e.target;
+          setTimeout(() => el.classList.add('reveal-visible'), parseInt(el.dataset.delay||0));
+          io.unobserve(el);
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -48px 0px' });
+
+      document.querySelectorAll('[data-reveal]').forEach(el => {
+        el.classList.add('reveal-hidden');
+        io.observe(el);
+      });
+
+      // Stat counter animation
+      document.querySelectorAll('.exp-stat-num').forEach(el => {
+        const raw = el.textContent.trim();
+        const num = parseInt(raw);
+        if (isNaN(num)) return;
+        const suffix = raw.replace(String(num), '');
+        const statIo = new IntersectionObserver(([entry]) => {
+          if (!entry.isIntersecting) return;
+          let start = null;
+          const step = ts => {
+            if (!start) start = ts;
+            const p = Math.min((ts - start) / 1000, 1);
+            const eased = 1 - Math.pow(1-p, 3);
+            el.textContent = Math.floor(eased * num) + suffix;
+            if (p < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+          statIo.unobserve(entry.target);
+        }, { threshold: 0.8 });
+        statIo.observe(el);
+      });
+
+      // Card hover tilt
+      document.querySelectorAll('.exp-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width  - 0.5;
+          const y = (e.clientY - r.top)  / r.height - 0.5;
+          card.style.transform = `translateY(-8px) rotateX(${-y*5}deg) rotateY(${x*5}deg)`;
+          card.style.transition = 'transform 0.08s ease';
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = '';
+          card.style.transition = 'transform 0.45s cubic-bezier(0.16,1,0.3,1)';
+        });
+      });
+    });
+    </script>
   </body>
 </html>

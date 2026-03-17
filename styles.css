@@ -632,3 +632,67 @@ section { padding: 5.5rem 1.25rem; }
   .currently-working-banner::before { animation: none !important; }
   .skeleton       { animation: none !important; }
 }
+
+/* ============================================================
+   PHASE 3 ADDITIONS
+   ============================================================ */
+
+/* --- Hero: "Open to opportunities" badge --- */
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(16,185,129,0.1); border: 1.5px solid rgba(16,185,129,0.35);
+  color: #10b981; font-size: 0.82rem; font-weight: 600;
+  padding: 0.3rem 0.85rem; border-radius: 30px;
+  margin-bottom: 1.1rem; letter-spacing: 0.02em;
+}
+.badge-dot {
+  width: 7px; height: 7px; background: #10b981; border-radius: 50%;
+  animation: pulseDot 1.6s ease-in-out infinite;
+}
+
+/* --- Ghost (tertiary) button --- */
+.btn-ghost {
+  background: transparent; color: var(--text2);
+  border: 2px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
+
+/* --- Hero: Social proof strip --- */
+.hero-proof {
+  display: flex; align-items: center; gap: 1.2rem;
+  margin-top: 1.8rem; padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  justify-content: center;
+}
+.proof-item { text-align: center; }
+.proof-num {
+  display: block; font-size: 1.1rem; font-weight: 700;
+  color: var(--primary); line-height: 1.2;
+}
+.proof-label { font-size: 0.75rem; color: var(--text3); font-weight: 500; }
+.proof-divider {
+  width: 1px; height: 32px; background: var(--border); flex-shrink: 0;
+}
+
+/* --- Topic filter bar --- */
+.topic-filter-bar {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+.topic-filter-btn {
+  padding: 0.38rem 0.95rem; border-radius: 30px; border: 1.5px solid var(--border);
+  background: var(--surface); color: var(--text2); font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; transition: all 0.22s; font-family: inherit;
+}
+.topic-filter-btn:hover {
+  border-color: var(--primary); color: var(--primary);
+  background: rgba(99,102,241,0.06);
+}
+.topic-filter-btn.active {
+  background: var(--grad); color: #fff; border-color: transparent;
+  box-shadow: 0 3px 12px rgba(99,102,241,0.3);
+}
+
+/* --- Filter empty message --- */
+.filter-empty { animation: cardReveal 0.35s ease forwards; }
+@keyframes cardReveal { to { opacity:1; transform:translateY(0); } }
