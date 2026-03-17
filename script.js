@@ -118,6 +118,155 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     window.addEventListener('scroll', highlightNavigation);
 
+    // ============================================================
+    // --- SMART GITHUB PROJECT LOADER (Step 1 - PRO VERSION) ---
+    // ============================================================
+    async function loadProjects() {
+        const container = document.getElementById('auto-projects-container');
+        if (!container) return;
+
+        // Show skeleton loading cards
+        container.innerHTML = `
+            <div class="project-card skeleton-card">
+                <div class="skeleton skeleton-icon"></div>
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text short"></div>
+                <div class="skeleton skeleton-tags"></div>
+            </div>
+            <div class="project-card skeleton-card">
+                <div class="skeleton skeleton-icon"></div>
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text short"></div>
+                <div class="skeleton skeleton-tags"></div>
+            </div>
+            <div class="project-card skeleton-card">
+                <div class="skeleton skeleton-icon"></div>
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text short"></div>
+                <div class="skeleton skeleton-tags"></div>
+            </div>
+        `;
+
+        try {
+            const response = await fetch(
+                "https://api.github.com/users/aswin-m-kumar/repos?per_page=100",
+                {
+                    headers: {
+                        'Accept': 'application/vnd.github.mercy-preview+json' // Enables topics in response
+                    }
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`GitHub API error: ${response.status}`);
+            }
+
+            let repos = await response.json();
+
+            // --- FILTER: Remove forks and repos without descriptions ---
+            repos = repos.filter(repo =>
+                !repo.fork &&
+                repo.description &&
+                repo.description.trim() !== '' &&
+                !repo.name.includes('.github.io') // Exclude the portfolio repo itself
+            );
+
+            // --- SORT: Stars first, then by most recently updated ---
+            repos.sort((a, b) =>
+                b.stargazers_count - a.stargazers_count ||
+                new Date(b.updated_at) - new Date(a.updated_at)
+            );
+
+            // --- TAKE TOP 6 ---
+            const topRepos = repos.slice(0, 6);
+
+            container.innerHTML = '';
+
+            if (topRepos.length === 0) {
+                container.innerHTML = `
+                    <div class="no-projects-msg">
+                        <span class="material-icons">info</span>
+                        <p>No public repos with descriptions found. Add descriptions to your GitHub repos to show them here!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            topRepos.forEach((repo, index) => {
+                const card = document.createElement('div');
+                card.classList.add('project-card', 'auto-project-card');
+                card.style.animationDelay = `${index * 0.1}s`;
+
+                // Pick a language icon/color
+                const langColor = getLanguageColor(repo.language);
+                const updatedDate = new Date(repo.updated_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+                // Build topic tags (if any)
+                const topicTagsHTML = repo.topics && repo.topics.length > 0
+                    ? repo.topics.slice(0, 3).map(t => `<span class="tag topic-tag">${t}</span>`).join('')
+                    : '';
+
+                card.innerHTML = `
+                    <div class="project-icon" style="background: ${langColor.bg}">
+                        <span class="material-icons" style="color:${langColor.icon}">code</span>
+                    </div>
+                    <h3>${formatRepoName(repo.name)}</h3>
+                    <p>${repo.description}</p>
+                    <div class="project-meta-row">
+                        ${repo.language ? `<span class="meta-badge lang-badge"><span class="lang-dot" style="background:${langColor.dot}"></span>${repo.language}</span>` : ''}
+                        ${repo.stargazers_count > 0 ? `<span class="meta-badge"><span class="material-icons" style="font-size:0.9rem;">star</span>${repo.stargazers_count}</span>` : ''}
+                        <span class="meta-badge"><span class="material-icons" style="font-size:0.9rem;">schedule</span>${updatedDate}</span>
+                    </div>
+                    <div class="project-tags">
+                        ${topicTagsHTML}
+                    </div>
+                    <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary project-btn">
+                        <span class="material-icons">open_in_new</span>
+                        View on GitHub
+                    </a>
+                `;
+                container.appendChild(card);
+            });
+
+        } catch (error) {
+            console.error('Failed to load GitHub projects:', error);
+            container.innerHTML = `
+                <div class="no-projects-msg">
+                    <span class="material-icons">wifi_off</span>
+                    <p>Could not load projects right now. <a href="https://github.com/aswin-m-kumar" target="_blank">View on GitHub →</a></p>
+                </div>
+            `;
+        }
+    }
+
+    // Helper: Format repo name (kebab-case → Title Case)
+    function formatRepoName(name) {
+        return name
+            .replace(/[-_]/g, ' ')
+            .replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    // Helper: Language → color mapping
+    function getLanguageColor(language) {
+        const colors = {
+            'Python':     { bg: 'linear-gradient(135deg,#3572A5,#1e4d6b)', icon: '#fff', dot: '#3572A5' },
+            'JavaScript': { bg: 'linear-gradient(135deg,#f1e05a,#b8a800)', icon: '#1a1a1a', dot: '#f1e05a' },
+            'HTML':       { bg: 'linear-gradient(135deg,#e34c26,#a0311a)', icon: '#fff', dot: '#e34c26' },
+            'CSS':        { bg: 'linear-gradient(135deg,#563d7c,#3a2752)', icon: '#fff', dot: '#563d7c' },
+            'C':          { bg: 'linear-gradient(135deg,#555555,#333)', icon: '#fff', dot: '#555555' },
+            'C++':        { bg: 'linear-gradient(135deg,#f34b7d,#a0183f)', icon: '#fff', dot: '#f34b7d' },
+            'Dart':       { bg: 'linear-gradient(135deg,#00B4AB,#006b67)', icon: '#fff', dot: '#00B4AB' },
+            'default':    { bg: 'linear-gradient(135deg,#6366f1,#8b5cf6)', icon: '#fff', dot: '#6366f1' }
+        };
+        return colors[language] || colors['default'];
+    }
+
+    // Kick off the loader
+    loadProjects();
+
     // --- SMART CONTACT FORM with Formspree Integration ---
     const contactForm = document.getElementById('contactForm');
     const submitBtn = document.getElementById('contactSubmitBtn');
@@ -133,22 +282,17 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.innerHTML = 'Sending...';
             submitBtn.disabled = true;
 
-            // --- First, submit the form data to Formspree ---
             try {
                 const formspreeResponse = await fetch(contactForm.action, {
                     method: 'POST',
                     body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
+                    headers: { 'Accept': 'application/json' }
                 });
 
                 if (!formspreeResponse.ok) {
-                    // If Formspree fails, show an error and stop
                     throw new Error('Failed to send message. Please try again later.');
                 }
                 
-                // --- If Formspree is successful, then call Gemini API for the smart reply ---
                 const message = formData.get('message');
                 const name = formData.get('name');
 
@@ -160,9 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     The message is: "${message}"
                 `;
                 
-                const payload = {
-                    contents: [{ role: "user", parts: [{ text: prompt }] }]
-                };
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
 
                 const geminiResponse = await fetch(API_URL, {
                     method: 'POST',
