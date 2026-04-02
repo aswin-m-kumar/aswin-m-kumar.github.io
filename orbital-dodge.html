@@ -93,21 +93,13 @@
             <p id="finalScore" class="text-2xl mt-4 font-semibold hidden"></p>
             <button id="startButton" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 px-8 rounded-lg text-xl transition duration-300">Start Game</button>
             
-            <!-- Gemini Features -->
-            <div id="gemini-features" class="mt-4">
-                 <button id="storyButton" class="gemini-button">✨ Tell Me The Story</button>
-                 <p id="storyText" class="story-text"></p>
-            </div>
+
         </div>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-
-        // --- Gemini API Configuration ---
-        const API_KEY = ""; // This is handled by the environment, no need to add a key here.
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
 
         // UI Elements
         const scoreEl = document.getElementById('score');
@@ -117,9 +109,6 @@
         const modalText = document.getElementById('modalText');
         const startButton = document.getElementById('startButton');
         const finalScoreEl = document.getElementById('finalScore');
-        const storyButton = document.getElementById('storyButton');
-        const storyText = document.getElementById('storyText');
-        const geminiFeaturesDiv = document.getElementById('gemini-features');
 
 
         let player, center, projectiles, score, highScore, animationId, isGameOver;
@@ -128,29 +117,6 @@
         let orbitalRadius;
         let projectileSpawnInterval;
 
-        // --- Gemini API Helper Function ---
-        async function callGemini(prompt, loadingElement) {
-            if (loadingElement) loadingElement.innerText = 'Thinking...';
-            try {
-                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) {
-                    throw new Error(`API call failed with status: ${response.status}`);
-                }
-                const result = await response.json();
-                if (result.candidates && result.candidates[0].content.parts[0].text) {
-                    return result.candidates[0].content.parts[0].text.replace(/["']/g, ""); // Clean quotes
-                }
-                return null;
-            } catch (error) {
-                console.error("Gemini API call failed:", error);
-                return null; // Return null on error
-            }
-        }
 
         // --- Game Setup and Control ---
 
@@ -285,13 +251,7 @@
             finalScoreEl.innerText = `Final Score: ${score}`;
             finalScoreEl.classList.remove('hidden');
             startButton.innerText = 'Play Again';
-            geminiFeaturesDiv.style.display = 'none'; // Hide story button on game over
-
-            const gameOverPrompt = `You are a witty and slightly sarcastic AI game master. A player just finished a game of 'Orbital Dodge' with a score of ${score}. Write a short, clever, one-sentence comment about their performance. If the score is low (under 100), be funny and taunting. If the score is medium (100-500), be encouraging but still a bit sassy. If the score is high (over 500), be genuinely impressed and epic.`;
-            
-            modalText.innerText = 'Calculating your fate...';
-            const aiMessage = await callGemini(gameOverPrompt);
-            modalText.innerText = aiMessage || 'You were hit!'; // Fallback message
+            modalText.innerText = 'You were hit!';
         }
 
         async function showStartScreen() {
@@ -299,14 +259,7 @@
              modalText.innerText = 'Click or Tap to change orbit direction. Dodge the red cubes.';
              startButton.innerText = 'Start Game';
              finalScoreEl.classList.add('hidden');
-             geminiFeaturesDiv.style.display = 'block'; // Show gemini features
-             storyText.innerText = ''; // Clear old story
-
-             const titlePrompt = "Generate a single, cool, and epic-sounding name for a space-themed arcade game about dodging projectiles. The name should be short, 2-4 words max. Examples: 'Cosmic Drift', 'Void Runner', 'Starfall'. Do not add quotes or any other text around the name.";
-             
-             modalTitle.innerText = "Loading...";
-             const newTitle = await callGemini(titlePrompt);
-             modalTitle.innerText = newTitle || 'Orbital Dodge'; // Fallback title
+             modalTitle.innerText = 'Orbital Dodge';
         }
 
         // --- Event Listeners ---
@@ -329,16 +282,7 @@
             init();
         });
 
-        storyButton.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            storyButton.disabled = true;
-            const storyPrompt = "You are a master sci-fi storyteller. Write a very short (3-4 sentences) but epic and dramatic backstory for a lone pilot in a tiny ship, endlessly dodging a storm of cosmic projectiles in a forgotten nebula. Make it sound like the beginning of a legendary space opera.";
-            
-            storyText.innerText = 'Crafting your legend...';
-            const aiStory = await callGemini(storyPrompt);
-            storyText.innerText = aiStory || "In the vastness of space, a hero must rise..."; // Fallback story
-            storyButton.disabled = false;
-        });
+
 
         // Initial call to show start screen
         window.onload = () => {

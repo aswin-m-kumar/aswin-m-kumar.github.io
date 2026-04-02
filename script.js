@@ -357,7 +357,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // ============================================================
   // CONTACT FORM
   // ============================================================
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=`;
   const contactForm = document.getElementById('contactForm');
   const submitBtn   = document.getElementById('contactSubmitBtn');
   const formResp    = document.getElementById('form-response');
@@ -374,14 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
           method: 'POST', body: fd, headers: { Accept: 'application/json' },
         });
         if (!r.ok) throw new Error('Formspree failed');
-        const prompt = `You are a friendly assistant for Aswin M Kumar, an EEE student. ${fd.get('name')} sent: "${fd.get('message')}". Reply warmly in ≤30 words.`;
-        const gr = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] }),
-        });
         let msg = "Thank you! I'll get back to you soon.";
-        if (gr.ok) { const gd = await gr.json(); msg = gd?.candidates?.[0]?.content?.parts?.[0]?.text || msg; }
         formResp.textContent = `✨ ${msg}`;
         formResp.className = 'form-response success';
         formResp.style.display = 'block';
