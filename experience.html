@@ -19,7 +19,7 @@
             <span class="logo-text">Aswin M Kumar</span>
           </a>
         </div>
-        <div class="nav-menu">
+        <div class="nav-menu" id="primary-navigation">
           <a href="index.html" class="nav-link">Home</a>
           <a href="about.html" class="nav-link">About</a>
           <a href="experience.html" class="nav-link">Experience</a>
@@ -31,9 +31,9 @@
             <span class="material-icons">light_mode</span>
           </button>
         </div>
-        <div class="hamburger" id="hamburger">
+        <button class="hamburger" id="hamburger" type="button" aria-label="Open navigation menu" aria-controls="primary-navigation" aria-expanded="false">
           <span></span><span></span><span></span>
-        </div>
+        </button>
       </div>
     </nav>
 
@@ -389,12 +389,64 @@
         setTimeout(() => toggle.style.transform = '', 350);
       });
 
-      // Hamburger
+      // Hamburger - Touch Optimized
       const ham  = document.getElementById('hamburger');
       const menu = document.querySelector('.nav-menu');
-      ham.addEventListener('click', () => {
-        ham.classList.toggle('active');
-        menu.classList.toggle('active');
+
+      function setMenuOpen(isOpen) {
+        ham.classList.toggle('active', isOpen);
+        menu.classList.toggle('active', isOpen);
+        ham.setAttribute('aria-expanded', String(isOpen));
+        ham.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+        body.style.overflow = isOpen ? 'hidden' : '';
+      }
+
+      function toggleMenu() {
+        setMenuOpen(!menu.classList.contains('active'));
+      }
+
+      ham.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      // Close menu when clicking on a link
+      menu.querySelectorAll('.nav-link').forEach(link =>
+        link.addEventListener('click', () => {
+          setMenuOpen(false);
+        })
+      );
+
+      // Close menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (menu.classList.contains('active') &&
+            !menu.contains(e.target) &&
+            !ham.contains(e.target)) {
+          setMenuOpen(false);
+        }
+      });
+
+      // Swipe-to-close gesture
+      let touchStartX = 0, touchStartY = 0;
+      menu.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+      }, { passive: true });
+
+      menu.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].screenX;
+        const touchEndY = e.changedTouches[0].screenY;
+        const horizontalSwipe = touchStartX - touchEndX;
+        const verticalSwipe = touchStartY - touchEndY;
+        if (horizontalSwipe > 80 || (verticalSwipe < -100 && touchStartY < window.innerHeight / 3)) {
+          setMenuOpen(false);
+        }
+      }, { passive: true });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && menu.classList.contains('active')) {
+          setMenuOpen(false);
+        }
       });
 
       // Navbar scroll
@@ -445,19 +497,22 @@
       });
 
       // Card hover tilt
-      document.querySelectorAll('.exp-card').forEach(card => {
-        card.addEventListener('mousemove', e => {
-          const r = card.getBoundingClientRect();
-          const x = (e.clientX - r.left) / r.width  - 0.5;
-          const y = (e.clientY - r.top)  / r.height - 0.5;
-          card.style.transform = `translateY(-8px) rotateX(${-y*5}deg) rotateY(${x*5}deg)`;
-          card.style.transition = 'transform 0.08s ease';
+      const supportsFineHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      if (supportsFineHover) {
+        document.querySelectorAll('.exp-card').forEach(card => {
+          card.addEventListener('mousemove', e => {
+            const r = card.getBoundingClientRect();
+            const x = (e.clientX - r.left) / r.width  - 0.5;
+            const y = (e.clientY - r.top)  / r.height - 0.5;
+            card.style.transform = `translateY(-8px) rotateX(${-y*5}deg) rotateY(${x*5}deg)`;
+            card.style.transition = 'transform 0.08s ease';
+          });
+          card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+            card.style.transition = 'transform 0.45s cubic-bezier(0.16,1,0.3,1)';
+          });
         });
-        card.addEventListener('mouseleave', () => {
-          card.style.transform = '';
-          card.style.transition = 'transform 0.45s cubic-bezier(0.16,1,0.3,1)';
-        });
-      });
+      }
     });
     </script>
   </body>

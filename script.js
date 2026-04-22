@@ -25,21 +25,70 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // ============================================================
-  // MOBILE NAV
+  // MOBILE NAV - Touch Optimized
   // ============================================================
   const hamburger = document.getElementById('hamburger');
   const navMenu = document.querySelector('.nav-menu');
 
-  hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navMenu.classList.toggle('active');
+  function setMenuOpen(isOpen) {
+    hamburger.classList.toggle('active', isOpen);
+    navMenu.classList.toggle('active', isOpen);
+    hamburger.setAttribute('aria-expanded', String(isOpen));
+    hamburger.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+    body.style.overflow = isOpen ? 'hidden' : '';
+  }
+
+  function toggleMenu() {
+    setMenuOpen(!navMenu.classList.contains('active'));
+  }
+
+  hamburger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMenu();
   });
+
+  // Close menu when clicking on a link
   document.querySelectorAll('.nav-link').forEach(link =>
     link.addEventListener('click', () => {
-      hamburger.classList.remove('active');
-      navMenu.classList.remove('active');
+      setMenuOpen(false);
     })
   );
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (navMenu.classList.contains('active') &&
+        !navMenu.contains(e.target) &&
+        !hamburger.contains(e.target)) {
+      setMenuOpen(false);
+    }
+  });
+
+  // Swipe-to-close gesture for mobile menu
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  navMenu.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  navMenu.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].screenX;
+    const touchEndY = e.changedTouches[0].screenY;
+    const horizontalSwipe = touchStartX - touchEndX;
+    const verticalSwipe = touchStartY - touchEndY;
+
+    // Close on a left swipe, or on a downward pull from the upper menu area.
+    if (horizontalSwipe > 80 || (verticalSwipe < -100 && touchStartY < window.innerHeight / 3)) {
+      setMenuOpen(false);
+    }
+  }, { passive: true });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+      setMenuOpen(false);
+    }
+  });
 
   // ============================================================
   // SMOOTH SCROLL
@@ -193,35 +242,39 @@ document.addEventListener('DOMContentLoaded', function () {
   // ============================================================
   // TILT EFFECT ON PROJECT CARDS (subtle 3D)
   // ============================================================
-  document.querySelectorAll('.project-card.featured-card').forEach(card => {
-    card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width  - 0.5;
-      const y = (e.clientY - rect.top)  / rect.height - 0.5;
-      card.style.transform = `translateY(-10px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg) scale(1.015)`;
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = '';
-      card.style.transition = 'transform 0.5s ease';
-    });
-    card.addEventListener('mouseenter', () => {
-      card.style.transition = 'transform 0.1s ease';
-    });
-  });
+  const supportsFineHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-  // Standard hover for auto + cert cards
-  document.querySelectorAll('.project-card:not(.featured-card), .certificate-card').forEach(card => {
-    card.addEventListener('mouseenter', () => card.style.transform = 'translateY(-8px) scale(1.01)');
-    card.addEventListener('mouseleave', () => card.style.transform = '');
-  });
+  if (supportsFineHover) {
+    document.querySelectorAll('.project-card.featured-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width  - 0.5;
+        const y = (e.clientY - rect.top)  / rect.height - 0.5;
+        card.style.transform = `translateY(-10px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg) scale(1.015)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+        card.style.transition = 'transform 0.5s ease';
+      });
+      card.addEventListener('mouseenter', () => {
+        card.style.transition = 'transform 0.1s ease';
+      });
+    });
 
-  // ============================================================
-  // SKILL TAG HOVER
-  // ============================================================
-  document.querySelectorAll('.skill-tag').forEach(tag => {
-    tag.addEventListener('mouseenter', () => tag.style.transform = 'scale(1.1) rotate(4deg)');
-    tag.addEventListener('mouseleave', () => tag.style.transform = '');
-  });
+    // Standard hover for auto + cert cards
+    document.querySelectorAll('.project-card:not(.featured-card), .certificate-card').forEach(card => {
+      card.addEventListener('mouseenter', () => card.style.transform = 'translateY(-8px) scale(1.01)');
+      card.addEventListener('mouseleave', () => card.style.transform = '');
+    });
+
+    // ============================================================
+    // SKILL TAG HOVER
+    // ============================================================
+    document.querySelectorAll('.skill-tag').forEach(tag => {
+      tag.addEventListener('mouseenter', () => tag.style.transform = 'scale(1.1) rotate(4deg)');
+      tag.addEventListener('mouseleave', () => tag.style.transform = '');
+    });
+  }
 
   // ============================================================
   // ★ SMART GITHUB PROJECT LOADER

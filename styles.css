@@ -30,6 +30,7 @@
   --grad:       linear-gradient(135deg, var(--primary), var(--secondary));
   --grad2:      linear-gradient(135deg, var(--accent), var(--success));
   --grad3:      linear-gradient(135deg, var(--warning), var(--error));
+  --nav-height: 70px;
 
   /* Scroll reveal timings */
   --reveal-dur:  0.65s;
@@ -65,7 +66,11 @@
    BASE
    ============================================================ */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; font-size: 16px; }
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-tap-highlight-color: rgba(99,102,241,0.22);
+}
 body {
   font-family: "Inter", sans-serif;
   line-height: 1.6;
@@ -118,7 +123,7 @@ body {
 [data-theme="dark"] .navbar.scrolled { background: rgba(15,23,42,0.98); }
 
 .nav-container {
-  display: flex; justify-content: space-between; align-items: center; height: 70px;
+  display: flex; justify-content: space-between; align-items: center; height: var(--nav-height);
 }
 .logo-text {
   font-size: 1.5rem; font-weight: 700;
@@ -143,20 +148,34 @@ body {
   background: none; border: 2px solid var(--border); border-radius: 50%;
   width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
   cursor: pointer; color: var(--text); transition: border-color 0.25s, transform 0.35s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .theme-toggle:hover { border-color: var(--primary); transform: scale(1.1) rotate(20deg); }
+.theme-toggle:active { transform: scale(0.95); }
 
+/* Hamburger menu - touch-optimized */
 .hamburger { display: none; flex-direction: column; cursor: pointer; }
 .hamburger span {
   width: 25px; height: 3px; background: var(--text);
   margin: 3px 0; transition: 0.3s; border-radius: 2px;
+}
+/* Touch target for hamburger (44x44px minimum) */
+.hamburger::before {
+  content: '';
+  position: absolute;
+  width: 44px; height: 44px;
+  top: 50%; right: 0;
+  transform: translate(-50%, -50%);
 }
 
 /* ============================================================
    HERO — with mesh gradient orbs + floating cards
    ============================================================ */
 .hero {
-  min-height: 100vh; display: flex; align-items: center;
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  display: flex; align-items: center;
   background: var(--bg); position: relative; overflow: hidden;
 }
 
@@ -198,7 +217,6 @@ body {
 .hero-side .hero-visual {
   width: 100%;
   max-width: 420px;
-}
 }
 
 .hero-title {
@@ -257,6 +275,8 @@ body {
   padding: 0.78rem 2rem; border-radius: 50px; text-decoration: none; font-weight: 600;
   transition: all 0.28s; display: inline-flex; align-items: center; gap: 0.5rem;
   border: none; cursor: pointer; font-size: 1rem; position: relative; overflow: hidden;
+  min-height: 48px; touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(99,102,241,0.22);
 }
 .btn::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit;
@@ -273,6 +293,16 @@ body {
   border: 2px solid var(--primary);
 }
 .btn-secondary:hover { background: var(--primary); color: #fff; transform: translateY(-2px); }
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+.btn-primary:active {
+  box-shadow: 0 3px 12px rgba(99,102,241,0.35);
+}
+.btn-secondary:active,
+.btn-ghost:active {
+  background: rgba(99,102,241,0.12);
+}
 
 /* Floating cards */
 .hero-visual {
@@ -631,22 +661,77 @@ section { padding: 5.5rem 1.25rem; }
   .contact-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
+  /* Mobile navigation with dvh for browser chrome handling */
   .nav-menu {
-    position: fixed; left: -100%; top: 70px; flex-direction: column;
+    position: fixed; left: -100%; top: var(--nav-height); flex-direction: column;
     background: var(--surface); width: 100%; text-align: center;
     transition: left 0.3s; box-shadow: 0 10px 28px var(--shadow);
-    padding: 2rem 0; height: calc(100vh - 70px); overflow-y: auto;
+    gap: 0.25rem;
+    padding: 1.25rem 0 calc(1.25rem + env(safe-area-inset-bottom, 0px));
+    height: calc(100vh - var(--nav-height));
+    height: calc(100dvh - var(--nav-height)); /* Dynamic viewport height for mobile browsers */
+    max-height: calc(100vh - var(--nav-height));
+    max-height: calc(100dvh - var(--nav-height));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   }
   .nav-menu.active { left: 0; }
+
+  /* Touch-optimized nav links with proper tap targets */
+  .nav-menu .nav-link {
+    display: block;
+    padding: 0.9rem 1.5rem; /* Increased vertical padding for 48px+ tap target */
+    min-height: 48px; /* WCAG minimum touch target */
+    line-height: 1.4;
+    border-radius: 8px;
+    margin: 0.25rem 1rem;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+  }
+  .nav-menu .nav-link:active {
+    background: rgba(99, 102, 241, 0.1);
+  }
+
+  /* Theme toggle in mobile menu */
+  .nav-menu .theme-toggle {
+    margin: 1rem auto;
+    display: flex;
+  }
+
+  /* Hamburger menu - touch-optimized */
   .hamburger { display: flex; }
+  .hamburger {
+    position: relative;
+    width: 44px; height: 44px; /* Proper touch target size */
+    padding: 0;
+    border: 0;
+    background: transparent;
+    justify-content: center;
+    align-items: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .hamburger:active {
+    opacity: 0.7;
+  }
   .hamburger.active span:nth-child(2) { opacity: 0; }
   .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
   .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+  /* Remove the ::before touch target extension since we now size the hamburger itself */
+  .hamburger::before { display: none; }
+
   .hero-buttons { flex-direction: column; align-items: center; max-width: 280px; margin: 0 auto; }
   .home-contact-methods .contact-item {
     padding: 0.95rem;
   }
-  .btn { width: 100%; justify-content: center; }
+  .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 48px; /* Touch target */
+  }
   .projects-grid { grid-template-columns: 1fr; }
   .floating-card { flex-basis: 100%; }
 }
@@ -1260,7 +1345,7 @@ body {
 }
 
 .projects-lab-section .project-card h3::before {
-  content: '>'; 
+  content: '>';
   color: var(--primary);
   margin-right: 0.35rem;
   font-family: "JetBrains Mono", monospace;
@@ -1285,7 +1370,7 @@ body {
 }
 
 .projects-lab-fun-zone .section-title::before {
-  content: '<>'; 
+  content: '<>';
 }
 
 .project-card::before,
@@ -1412,5 +1497,498 @@ body {
     display: block;
     margin-left: 0;
     margin-top: 0.3rem;
+  }
+
+  /* Main content padding adjustment for mobile navbar */
+  body > main,
+  .hero,
+  .experience-page,
+  .game-page {
+    padding-top: var(--nav-height); /* Match navbar height */
+  }
+}
+
+/* ============================================================
+   PHASE 1 COMPLETE: Mobile Navigation Touch Optimizations
+   ============================================================ */
+
+/* Safe area insets for notched devices (iPhone X+) */
+@supports (padding: max(0px)) {
+  @media (max-width: 768px) {
+    .navbar {
+      padding-left: max(0px, env(safe-area-inset-left));
+      padding-right: max(0px, env(safe-area-inset-right));
+    }
+    .nav-container {
+      padding-left: max(1.5rem, env(safe-area-inset-left));
+      padding-right: max(1.5rem, env(safe-area-inset-right));
+    }
+  }
+}
+
+/* ============================================================
+   PHASE 2 COMPLETE: Hero Mobile Refinements
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .hero {
+    align-items: flex-start;
+  }
+
+  .hero-content {
+    gap: 1.35rem;
+  }
+
+  .hero-side {
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .hero-side .hero-image-placeholder,
+  .hero-side .hero-visual {
+    max-width: 340px;
+  }
+
+  .hero-terminal {
+    overflow: hidden;
+  }
+
+  .hero-terminal p {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .hero-proof {
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+  }
+
+  .proof-item {
+    flex: 1 1 92px;
+    min-width: 92px;
+  }
+
+  .proof-divider {
+    display: none;
+  }
+
+  .hero-visual {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0.85rem;
+    align-items: stretch;
+  }
+
+  .floating-card {
+    width: 100%;
+    flex-basis: auto;
+    padding: 1.15rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-content {
+    gap: 1rem;
+  }
+
+  .hero-text {
+    padding: 1rem;
+  }
+
+  .hero-side .hero-image-placeholder,
+  .hero-side .hero-visual {
+    max-width: 280px;
+  }
+
+  .hero-side .containment-portrait {
+    width: min(240px, 100%);
+    margin: 0.75rem auto;
+  }
+
+  .hero-terminal {
+    padding: 0.8rem;
+  }
+
+  .hero-terminal p {
+    font-size: 0.75rem;
+    line-height: 1.55;
+  }
+
+  .hero-proof {
+    gap: 0.65rem;
+  }
+
+  .proof-num {
+    font-size: 1rem;
+  }
+
+  .proof-label {
+    font-size: 0.7rem;
+  }
+
+  .floating-card {
+    padding: 1rem;
+  }
+}
+
+/* ============================================================
+   PHASE 3 COMPLETE: Mobile Content Card Refinements
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .project-card,
+  .certificate-card,
+  .skill-category,
+  .stat-card,
+  .currently-working-banner {
+    padding: 1.25rem;
+  }
+
+  .project-icon,
+  .certificate-icon,
+  .cwb-icon,
+  .skeleton-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .project-icon .material-icons,
+  .certificate-icon .material-icons,
+  .cwb-icon .material-icons {
+    font-size: 1.45rem;
+  }
+
+  .skill-items,
+  .project-tags,
+  .project-meta-row {
+    gap: 0.5rem;
+  }
+
+  .skill-tag,
+  .tag,
+  .meta-badge,
+  .topic-tag {
+    line-height: 1.35;
+    white-space: normal;
+  }
+
+  .skill-category h3,
+  .project-card h3,
+  .certificate-card h3 {
+    margin-bottom: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .project-card,
+  .certificate-card,
+  .skill-category,
+  .stat-card,
+  .currently-working-banner {
+    padding: 1.15rem;
+  }
+
+  .projects-grid,
+  .certificates-grid,
+  .skills-grid {
+    gap: 1rem;
+  }
+}
+
+/* ============================================================
+   PHASE 4 COMPLETE: Touch Interaction Refinements
+   ============================================================ */
+
+button,
+a,
+.btn,
+.nav-link,
+.contact-item,
+.project-card,
+.certificate-card,
+.skill-category,
+.stat-card,
+.floating-card,
+.topic-filter-btn,
+.skill-tag,
+.tag,
+.meta-badge {
+  touch-action: manipulation;
+}
+
+button,
+.btn,
+.topic-filter-btn,
+.project-btn,
+.contact-form button {
+  min-height: 48px;
+}
+
+button,
+.btn,
+.topic-filter-btn {
+  -webkit-tap-highlight-color: rgba(99,102,241,0.22);
+}
+
+.form-group input,
+.form-group textarea {
+  font-size: 16px;
+}
+
+.btn:active,
+.topic-filter-btn:active,
+.project-btn:active,
+.contact-form button:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.contact-item:active,
+.floating-card:active,
+.project-card:active,
+.certificate-card:active,
+.skill-category:active,
+.stat-card:active {
+  transform: scale(0.985);
+  border-color: rgba(0,240,255,0.38);
+  box-shadow: 0 0 0 1px rgba(0,240,255,0.16), 0 8px 18px var(--shadow);
+}
+
+.skill-tag:active,
+.tag:active,
+.meta-badge:active {
+  filter: brightness(1.08);
+  transform: scale(0.96);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .btn:hover,
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .btn-ghost:hover,
+  .topic-filter-btn:hover {
+    transform: none;
+  }
+
+  .floating-card:hover,
+  .project-card:hover,
+  .certificate-card:hover,
+  .skill-category:hover,
+  .stat-card:hover,
+  .contact-item:hover,
+  .exp-card:hover {
+    transform: none;
+  }
+
+  .skill-category:hover::before {
+    opacity: 0;
+  }
+
+  .contact-item a:hover {
+    color: var(--text2);
+  }
+}
+
+/* ============================================================
+   PHASE 5 COMPLETE: Skills & Certificates Mobile Layouts
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .certificates-grid {
+    gap: 1.25rem;
+  }
+
+  .certificate-card {
+    width: 100%;
+  }
+
+  .certificate-card .btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .skills-grid,
+  .certificates-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .certificate-card {
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .certificate-card .certificate-icon {
+    align-self: center;
+  }
+
+  .certificate-card h3,
+  .certificate-card p {
+    text-align: center;
+  }
+
+  .certificate-card .btn + .btn {
+    margin-top: 0.75rem;
+  }
+}
+
+/* ============================================================
+   PHASE 6 COMPLETE: Contact Form Mobile Refinements
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .contact-info {
+    gap: 1rem;
+  }
+
+  .contact-item {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .contact-item > div {
+    min-width: 0;
+  }
+
+  .contact-item a {
+    overflow-wrap: anywhere;
+  }
+
+  .contact-form {
+    padding: 1.25rem;
+    width: 100%;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .contact-form .btn-primary,
+  #contactSubmitBtn {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-info {
+    gap: 0.85rem;
+  }
+
+  .contact-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 1.05rem;
+  }
+
+  .contact-item .material-icons,
+  .contact-item .icon-github,
+  .contact-item .icon-linkedin,
+  .contact-item .icon-instagram {
+    width: 1.65rem;
+    height: 1.65rem;
+    font-size: 1.65rem;
+  }
+
+  .contact-form {
+    padding: 1.15rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+}
+
+/* ============================================================
+   PHASE 8 COMPLETE: Mobile Performance Optimizations
+   ============================================================ */
+
+.projects-grid,
+.certificates-grid,
+.skills-grid,
+.timeline,
+.contact-grid {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+.project-card,
+.certificate-card,
+.skill-category,
+.timeline-item,
+.contact-item,
+.currently-working-banner {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 260px;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    backdrop-filter: blur(10px) saturate(1.25);
+    -webkit-backdrop-filter: blur(10px) saturate(1.25);
+  }
+
+  .hero::before,
+  .hero::after {
+    filter: blur(38px);
+    opacity: 0.65;
+  }
+
+  .hero-text {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .project-card,
+  .featured-card {
+    transform-style: flat;
+  }
+
+  .floating-card,
+  .project-card,
+  .certificate-card,
+  .skill-category,
+  .stat-card,
+  .contact-item,
+  .contact-form,
+  .currently-working-banner {
+    box-shadow: 0 0 0 1px rgba(0,240,255,0.08), 0 8px 16px var(--shadow);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero::before,
+  .hero::after {
+    filter: blur(28px);
+    opacity: 0.45;
+  }
+
+  .project-card,
+  .certificate-card,
+  .skill-category,
+  .timeline-item,
+  .contact-item,
+  .currently-working-banner {
+    contain-intrinsic-size: auto 220px;
   }
 }

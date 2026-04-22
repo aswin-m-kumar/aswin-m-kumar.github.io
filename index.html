@@ -16,7 +16,7 @@
         <div class="nav-logo">
           <span class="logo-text">Aswin M Kumar</span>
         </div>
-        <div class="nav-menu">
+        <div class="nav-menu" id="primary-navigation">
           <a href="index.html" class="nav-link">Home</a>
           <a href="about.html" class="nav-link">About</a>
           <a href="experience.html" class="nav-link">Experience</a>
@@ -28,9 +28,9 @@
             <span class="material-icons">light_mode</span>
           </button>
         </div>
-        <div class="hamburger" id="hamburger">
+        <button class="hamburger" id="hamburger" type="button" aria-label="Open navigation menu" aria-controls="primary-navigation" aria-expanded="false">
           <span></span><span></span><span></span>
-        </div>
+        </button>
       </div>
     </nav>
 
@@ -119,7 +119,7 @@
               <!-- Profile pic -->
               <div class="hero-image-placeholder containment-portrait">
                 <div class="containment-photo-wrap">
-                  <img src="asset/pfp.png" alt="Profile Picture" class="containment-photo" />
+                  <img src="asset/pfp.png" alt="Profile Picture" class="containment-photo" decoding="async" fetchpriority="high" />
                   <span class="scan-line" aria-hidden="true"></span>
                   <span class="corner tl" aria-hidden="true"></span>
                   <span class="corner tr" aria-hidden="true"></span>

@@ -244,28 +244,63 @@
    RESPONSIVE
    ============================================================ */
 @media (max-width: 760px) {
+  .experience-page::before,
+  .experience-page::after {
+    filter: blur(40px);
+    opacity: 0.55;
+  }
+
   /* Stack timeline to single column */
-  .timeline::before { left: 20px; transform: none; }
+  .timeline::before { left: 12px; transform: none; }
 
   .timeline-item,
   .timeline-item:nth-child(even) {
     justify-content: flex-start;
-    padding-left: 3.5rem;
+    padding-left: 2.75rem;
     padding-right: 0;
   }
   .timeline-item::before,
   .timeline-item:nth-child(even)::before {
-    left: 14px; transform: none;
+    left: 6px; transform: none;
   }
 
   .exp-stats-row { gap: 0.75rem; }
   .exp-stat-pill { padding: 0.5rem 1rem; }
+  .exp-card-header { padding: 1.25rem 1.25rem 0.85rem; }
+  .exp-card-body { padding: 0 1.25rem 1.25rem; }
+  .exp-card-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+  }
+  .exp-card-icon .material-icons { font-size: 1.3rem; }
+  .exp-card-tags { gap: 0.5rem; }
+  .exp-tag {
+    line-height: 1.35;
+    white-space: normal;
+  }
+  .exp-stat-pill,
+  .exp-card {
+    box-shadow: 0 0 0 1px rgba(0,240,255,0.08), 0 8px 16px rgba(0,0,0,0.2);
+  }
 }
 
 @media (max-width: 480px) {
+  .experience-page::before,
+  .experience-page::after {
+    filter: blur(28px);
+    opacity: 0.4;
+  }
+
   .exp-card-header { flex-wrap: wrap; }
   .exp-card-duration { align-self: flex-start; }
   .experience-page { padding-top: 90px; }
+  .timeline-item,
+  .timeline-item:nth-child(even) {
+    padding-left: 2.35rem;
+  }
+  .exp-card-header { padding: 1.15rem 1.15rem 0.8rem; }
+  .exp-card-body { padding: 0 1.15rem 1.15rem; }
 }
 
 /* ============================================================
@@ -275,4 +310,37 @@
   .experience-page::before,
   .experience-page::after { animation: none; }
   .exp-card { transition: none; }
+}
+
+/* ============================================================
+   PHASE 4 COMPLETE: Experience Touch Interaction Refinements
+   ============================================================ */
+
+.exp-card,
+.exp-tag,
+.exp-card-duration {
+  touch-action: manipulation;
+}
+
+.exp-card:active {
+  transform: scale(0.985);
+  border-color: rgba(0,240,255,0.38);
+  box-shadow: 0 0 0 1px rgba(0,240,255,0.16), 0 8px 18px var(--shadow);
+}
+
+.exp-tag:active,
+.exp-card-duration:active {
+  filter: brightness(1.08);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .exp-card:hover {
+    transform: none;
+  }
+
+  .exp-card:hover .exp-tag {
+    background: rgba(148,163,184,0.08);
+    color: var(--text2);
+    border-color: var(--border);
+  }
 }

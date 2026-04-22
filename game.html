@@ -39,15 +39,24 @@
         .btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
             border-radius: 9999px; /* pill shape */
             border: none;
             font-weight: 600;
             font-size: 1rem;
+            min-height: 48px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
+            touch-action: manipulation;
+        }
+        .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         .btn-primary {
             background-color: var(--primary);
@@ -116,6 +125,18 @@
             max-width: 600px;
             margin: 0 auto 2rem auto;
         }
+        .level-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            background: rgba(56, 189, 248, 0.08);
+            border-radius: 9999px;
+            padding: 0.45rem 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
 
         /* --- Footer --- */
         .footer {
@@ -150,13 +171,26 @@
             border: 2px solid var(--border-color);
             border-radius: 15px;
             box-shadow: 0 5px 20px var(--shadow-color);
+            width: min(500px, calc(100vw - 2rem));
             max-width: 100%;
             height: auto;
+            aspect-ratio: 1 / 1;
+            touch-action: manipulation;
+            user-select: none;
         }
 
         .game-controls {
             display: flex;
             gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .touch-controls {
+            display: none;
+            width: min(500px, calc(100vw - 2rem));
+            gap: 0.75rem;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -231,6 +265,64 @@
             color: var(--text-secondary);
             margin: 1rem 0 2rem 0;
         }
+
+        @media (max-width: 768px) {
+            .game-page {
+                padding-top: 96px;
+                padding-bottom: 2.5rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .section-description {
+                font-size: 1rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .game-container {
+                gap: 1rem;
+                margin-top: 1.25rem;
+            }
+
+            .game-controls,
+            .touch-controls {
+                width: min(100%, 340px);
+            }
+
+            .game-controls .btn,
+            .touch-controls .btn {
+                width: 100%;
+            }
+
+            .touch-controls {
+                display: flex;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: calc(100dvh - 2rem);
+                overflow-y: auto;
+                padding: 1.25rem;
+                border-radius: 16px;
+            }
+
+            .modal-content ul li {
+                align-items: flex-start;
+                font-size: 1rem;
+            }
+
+            .navbar,
+            .modal {
+                backdrop-filter: blur(2px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -246,20 +338,24 @@
         </a>
       </div>
     </nav>
-        </a>
-      </div>
-    </nav>
 
     <!-- Game Section -->
     <main class="game-page">
       <div class="container">
-        <h1 class="section-title">Complete the Circuit</h1>
-        <p class="section-description">
+        <h1 id="gameTitle" class="section-title">Complete the Circuit</h1>
+        <p id="gameDescription" class="section-description">
           Rotate the tiles to connect the power source to the light bulb and light it up!
         </p>
+        <div id="levelStatus" class="level-status" aria-live="polite">Level 1 of 5</div>
 
         <div class="game-container">
             <canvas id="gameCanvas" width="500" height="500"></canvas>
+            <div class="touch-controls" aria-label="Touch controls">
+                <button id="rotateSelectedBtn" class="btn btn-primary" disabled>
+                    <span class="material-icons">rotate_right</span>
+                    Rotate Selected
+                </button>
+            </div>
             <div class="game-controls">
                 <button id="resetBtn" class="btn btn-secondary">
                     <span class="material-icons">refresh</span>
@@ -282,7 +378,9 @@
             <ul>
                 <li><span class="material-icons" style="color: var(--primary);">emoji_objects</span>Your goal is to light up the bulb 💡.</li>
                 <li><span class="material-icons" style="color: var(--primary);">power</span>Create a continuous path from the power source 🔋 to the bulb.</li>
-                <li><span class="material-icons" style="color: var(--primary);">rotate_right</span>Click on any wire or corner piece to rotate it 90 degrees clockwise.</li>
+                <li><span class="material-icons" style="color: var(--primary);">rotate_right</span>Click or tap any wire or corner piece to rotate it 90 degrees clockwise.</li>
+                <li><span class="material-icons" style="color: var(--primary);">touch_app</span>On mobile, use Rotate Selected to spin the last tile you touched again.</li>
+                <li><span class="material-icons" style="color: var(--primary);">route</span>Clear all five circuit boards to complete the pack.</li>
                 <li><span class="material-icons" style="color: var(--primary);">celebration</span>Once the circuit is complete, the bulb will light up!</li>
             </ul>
         </div>
@@ -291,13 +389,13 @@
     <!-- Win Modal -->
     <div id="winModal" class="modal">
         <div class="modal-content">
-            <h2 class="modal-title">Circuit Complete!</h2>
-            <p class="modal-body">
+            <h2 id="winTitle" class="modal-title">Circuit Complete!</h2>
+            <p id="winMessage" class="modal-body">
                 Congratulations! You successfully powered the bulb.
             </p>
             <button id="playAgainBtn" class="btn btn-primary">
-                <span class="material-icons">replay</span>
-                Play Again
+                <span id="playAgainIcon" class="material-icons">replay</span>
+                <span id="playAgainLabel">Play Again</span>
             </button>
         </div>
     </div>
@@ -315,14 +413,22 @@
         // --- Canvas and DOM Elements ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const gameTitle = document.getElementById('gameTitle');
+        const gameDescription = document.getElementById('gameDescription');
+        const levelStatus = document.getElementById('levelStatus');
         const resetBtn = document.getElementById('resetBtn');
         const instructionsBtn = document.getElementById('instructionsBtn');
+        const rotateSelectedBtn = document.getElementById('rotateSelectedBtn');
         
         // Modals
         const instructionsModal = document.getElementById('instructionsModal');
         const winModal = document.getElementById('winModal');
         const closeInstructionsBtn = instructionsModal.querySelector('.close-button');
         const playAgainBtn = document.getElementById('playAgainBtn');
+        const winTitle = document.getElementById('winTitle');
+        const winMessage = document.getElementById('winMessage');
+        const playAgainIcon = document.getElementById('playAgainIcon');
+        const playAgainLabel = document.getElementById('playAgainLabel');
 
         // --- Game Constants ---
         const GRID_SIZE = 5;
@@ -341,16 +447,71 @@
         // --- Game State ---
         let level;
         let winState = false;
+        let selectedTile = null;
+        let currentLevelIndex = 0;
 
-        // --- NEW SOLVABLE LEVEL CONFIGURATION ---
-        // This level is guaranteed to be solvable. The bulb at the end
-        // now correctly accepts a connection from the left.
-        const initialLevel = [
-            [ { type: POWER, rotation: 1 }, { type: EMPTY },               { type: EMPTY },               { type: EMPTY },               { type: EMPTY } ],
-            [ { type: WIRE_I, rotation: 1 }, { type: EMPTY },               { type: EMPTY },               { type: EMPTY },               { type: EMPTY } ],
-            [ { type: WIRE_L, rotation: 2 }, { type: WIRE_I, rotation: 0 }, { type: WIRE_L, rotation: 1 }, { type: EMPTY },               { type: EMPTY } ],
-            [ { type: EMPTY },               { type: EMPTY },               { type: WIRE_I, rotation: 1 }, { type: EMPTY },               { type: EMPTY } ],
-            [ { type: EMPTY },               { type: EMPTY },               { type: WIRE_L, rotation: 3 }, { type: WIRE_I, rotation: 0 }, { type: BULB, rotation: 2 } ]
+        const E = () => ({ type: EMPTY });
+        const P = (rotation) => ({ type: POWER, rotation });
+        const B = (rotation) => ({ type: BULB, rotation });
+        const I = (rotation) => ({ type: WIRE_I, rotation });
+        const L = (rotation) => ({ type: WIRE_L, rotation });
+
+        const levels = [
+            {
+                name: 'Starter Loop',
+                description: 'A short training circuit. Build the route down, across, and into the bulb.',
+                grid: [
+                    [ P(1), E(),  E(),  E(),  E() ],
+                    [ I(1), E(),  E(),  E(),  E() ],
+                    [ L(2), I(0), L(1), E(),  E() ],
+                    [ E(),  E(),  I(1), E(),  E() ],
+                    [ E(),  E(),  L(3), I(0), B(2) ]
+                ]
+            },
+            {
+                name: 'Zigzag Feed',
+                description: 'The signal snakes through the upper lanes before dropping into the bulb.',
+                grid: [
+                    [ P(3), I(0), L(0), E(),  E() ],
+                    [ E(),  E(),  I(1), E(),  E() ],
+                    [ E(),  E(),  L(3), L(1), E() ],
+                    [ E(),  E(),  E(),  L(2), L(1) ],
+                    [ E(),  E(),  E(),  E(),  B(0) ]
+                ]
+            },
+            {
+                name: 'Middle Relay',
+                description: 'Route power through the center channel while ignoring the dead-end pieces.',
+                grid: [
+                    [ P(1), E(),  L(1), I(0), E() ],
+                    [ L(3), I(0), L(1), E(),  E() ],
+                    [ E(),  E(),  I(1), E(),  L(0) ],
+                    [ E(),  E(),  L(3), I(0), L(1) ],
+                    [ I(1), E(),  E(),  E(),  B(0) ]
+                ]
+            },
+            {
+                name: 'Cross Feed',
+                description: 'A compact crossing pattern. Keep the live path tight through the center.',
+                grid: [
+                    [ P(3), L(0), E(),  L(2), E() ],
+                    [ E(),  I(1), E(),  I(1), E() ],
+                    [ E(),  L(3), I(0), L(1), E() ],
+                    [ E(),  E(),  L(0), I(1), E() ],
+                    [ E(),  I(0), E(),  L(3), B(2) ]
+                ]
+            },
+            {
+                name: 'Final Bus',
+                description: 'The final board uses decoys near the main bus. Find the cleanest powered route.',
+                grid: [
+                    [ P(3), I(0), I(0), L(0), E() ],
+                    [ L(1), E(),  E(),  I(1), E() ],
+                    [ I(1), L(0), E(),  L(3), L(1) ],
+                    [ E(),  I(0), E(),  E(),  I(1) ],
+                    [ E(),  L(2), I(0), L(0), B(0) ]
+                ]
+            }
         ];
         
         /**
@@ -378,11 +539,22 @@
         /**
          * Initializes or resets the game to its starting state.
          */
-        function init() {
+        function updateLevelUI() {
+            const currentLevel = levels[currentLevelIndex];
+            gameTitle.textContent = currentLevel.name;
+            gameDescription.textContent = currentLevel.description;
+            levelStatus.textContent = `Level ${currentLevelIndex + 1} of ${levels.length}`;
+        }
+
+        function init(levelIndex = currentLevelIndex) {
+            currentLevelIndex = levelIndex;
             winState = false;
+            selectedTile = null;
+            updateTouchControls();
             winModal.classList.remove('show');
+            updateLevelUI();
             // Create a deep copy of the level to avoid modifying the original config.
-            level = JSON.parse(JSON.stringify(initialLevel));
+            level = JSON.parse(JSON.stringify(levels[currentLevelIndex].grid));
             checkWinCondition(); // Check initial state (in case it's already solved)
             drawBoard();
         }
@@ -397,6 +569,18 @@
                     drawTile(x, y, level[y][x]);
                 }
             }
+            drawSelectedTile();
+        }
+
+        function drawSelectedTile() {
+            if (!selectedTile) return;
+            const { x, y } = selectedTile;
+            ctx.save();
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 4;
+            ctx.setLineDash([10, 6]);
+            ctx.strokeRect(x * TILE_SIZE + 6, y * TILE_SIZE + 6, TILE_SIZE - 12, TILE_SIZE - 12);
+            ctx.restore();
         }
 
         /**
@@ -494,6 +678,17 @@
             const bulbTile = level[GRID_SIZE - 1][GRID_SIZE - 1]; // Assuming bulb is at the end
             if (bulbTile.powered && !winState) {
                 winState = true;
+                updateTouchControls();
+                const isLastLevel = currentLevelIndex === levels.length - 1;
+                const currentLevel = levels[currentLevelIndex];
+                const nextLevel = levels[currentLevelIndex + 1];
+
+                winTitle.textContent = isLastLevel ? 'All Circuits Complete!' : `${currentLevel.name} Complete!`;
+                winMessage.textContent = isLastLevel
+                    ? 'You powered every board in the Circuit Master pack.'
+                    : `Nice work. Advance to ${nextLevel.name}.`;
+                playAgainIcon.textContent = isLastLevel ? 'replay' : 'arrow_forward';
+                playAgainLabel.textContent = isLastLevel ? 'Restart Pack' : 'Next Level';
                 // Use a timeout to allow the final draw to render before showing the modal
                 setTimeout(() => {
                     winModal.classList.add('show');
@@ -502,33 +697,58 @@
             drawBoard();
         }
 
-
-        // --- Event Listeners ---
-        
-        // Handle clicks on the game canvas
-        canvas.addEventListener('click', (e) => {
-            if (winState) return; // Don't allow clicks after winning
-
+        function getTileFromPointer(e) {
             const rect = canvas.getBoundingClientRect();
-            // Scale click coordinates to canvas resolution
             const scaleX = canvas.width / rect.width;
             const scaleY = canvas.height / rect.height;
             const x = Math.floor((e.clientX - rect.left) * scaleX / TILE_SIZE);
             const y = Math.floor((e.clientY - rect.top) * scaleY / TILE_SIZE);
 
-            if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
-                const tile = level[y][x];
-                // Only allow rotation of wires
-                if (tile.type === WIRE_I || tile.type === WIRE_L) {
-                    tile.rotation = (tile.rotation + 1) % 4; // Cycle through 4 rotations
-                    checkWinCondition();
-                }
-            }
+            if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) return null;
+            return { x, y };
+        }
+
+        function canRotate(tile) {
+            return tile.type === WIRE_I || tile.type === WIRE_L;
+        }
+
+        function updateTouchControls() {
+            if (!rotateSelectedBtn) return;
+            rotateSelectedBtn.disabled = !selectedTile || winState;
+        }
+
+        function rotateTileAt(x, y) {
+            const tile = level[y][x];
+            if (!canRotate(tile) || winState) return;
+            tile.rotation = (tile.rotation + 1) % 4;
+            selectedTile = { x, y };
+            updateTouchControls();
+            checkWinCondition();
+        }
+
+
+        // --- Event Listeners ---
+
+        // Handle pointer input on the game canvas. Pointer events cover mouse, pen, and touch.
+        canvas.addEventListener('pointerup', (e) => {
+            if (winState) return; // Don't allow clicks after winning
+            e.preventDefault();
+
+            const tilePosition = getTileFromPointer(e);
+            if (!tilePosition) return;
+            rotateTileAt(tilePosition.x, tilePosition.y);
         });
 
         // Control buttons
-        resetBtn.addEventListener('click', init);
-        playAgainBtn.addEventListener('click', init);
+        resetBtn.addEventListener('click', () => init(currentLevelIndex));
+        playAgainBtn.addEventListener('click', () => {
+            const nextLevelIndex = currentLevelIndex + 1;
+            init(nextLevelIndex < levels.length ? nextLevelIndex : 0);
+        });
+        rotateSelectedBtn.addEventListener('click', () => {
+            if (!selectedTile) return;
+            rotateTileAt(selectedTile.x, selectedTile.y);
+        });
 
         // Modal controls
         instructionsBtn.addEventListener('click', () => instructionsModal.classList.add('show'));
