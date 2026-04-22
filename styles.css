@@ -1536,12 +1536,24 @@ body {
   }
 
   .hero-content {
+    grid-template-columns: 1fr;
     gap: 1.35rem;
+    align-items: stretch;
+  }
+
+  .hero-text {
+    order: 1;
+    position: relative;
+    z-index: 2;
   }
 
   .hero-side {
+    order: 2;
+    position: relative;
+    z-index: 1;
     gap: 0.85rem;
-    margin-bottom: 1rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0;
   }
 
   .hero-side .hero-image-placeholder,
@@ -1585,6 +1597,8 @@ body {
     width: 100%;
     flex-basis: auto;
     padding: 1.15rem;
+    animation: none;
+    transform: none;
   }
 }
 
