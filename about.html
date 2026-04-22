@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>About - Aswin M Kumar</title>
-    <title>About - Aswin M Kumar</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
@@ -20,8 +19,13 @@
       .col-4 { grid-column: span 4; }
       @media (max-width: 768px) {
         .col-4 { grid-column: span 12; }
+        .hero-title {
+          font-size: clamp(1.8rem, 8vw, 3rem);
+          line-height: 1.1;
+          overflow-wrap: anywhere;
+          word-break: break-word;
+        }
       }
-    </style>
     </style>
   </head>
   <body class="bg-surface text-on-surface min-h-screen flex flex-col font-body-md overflow-x-hidden selection:bg-threat-red selection:text-white">
@@ -56,7 +60,7 @@
       <!-- Header Section -->
       <header class="section-header" style="margin-bottom: 3rem;">
         <p class="hero-subtitle">&gt; INITIATING_PROFILE_SCAN</p>
-        <h1 class="hero-title glitch-effect" data-text="SUBJECT_PROFILE">SUBJECT_PROFILE</h1>
+        <h1 class="hero-title glitch-effect" data-text="SUBJECT_PROFILE" style="max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">SUBJECT_PROFILE</h1>
       </header>
 
       <div class="about-grid">
