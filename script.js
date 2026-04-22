@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const themeToggle = document.getElementById('themeToggle');
   const body = document.body;
   const themeIcon = themeToggle.querySelector('.material-icons');
-  const savedTheme = localStorage.getItem('theme') || 'light';
+  const savedTheme = localStorage.getItem('theme') || 'dark';
   body.setAttribute('data-theme', savedTheme);
   updateThemeIcon(savedTheme);
 
@@ -68,13 +68,33 @@ document.addEventListener('DOMContentLoaded', function () {
   // ============================================================
   // ACTIVE NAV HIGHLIGHT
   // ============================================================
+  const navLinks = document.querySelectorAll('.nav-link');
   const sections = document.querySelectorAll('section[id]');
+
+  function setActiveNavByPath() {
+    const path = window.location.pathname.split('/').pop() || 'index.html';
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href') || '';
+      if (!href.startsWith('#')) {
+        link.classList.toggle('active', href === path);
+      }
+    });
+  }
+
+  setActiveNavByPath();
+
   window.addEventListener('scroll', () => {
+    const hasHashLinks = [...navLinks].some(link => (link.getAttribute('href') || '').startsWith('#'));
+    if (!hasHashLinks) return;
+
     let current = '';
     sections.forEach(s => { if (window.scrollY >= s.offsetTop - 200) current = s.id; });
-    document.querySelectorAll('.nav-link').forEach(link =>
-      link.classList.toggle('active', link.getAttribute('href') === `#${current}`)
-    );
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href') || '';
+      if (href.startsWith('#')) {
+        link.classList.toggle('active', href === `#${current}`);
+      }
+    });
   });
 
   // ============================================================
@@ -145,26 +165,30 @@ document.addEventListener('DOMContentLoaded', function () {
   // ============================================================
   // STAT COUNTER ANIMATION
   // ============================================================
-  new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const h3 = entry.target.querySelector('h3');
-      if (!h3 || h3.dataset.counted) return;
-      h3.dataset.counted = '1';
-      const raw = h3.textContent.trim();
-      const num = parseInt(raw);
-      const suffix = raw.replace(String(num), '');
-      let start = null;
-      const step = ts => {
-        if (!start) start = ts;
-        const p = Math.min((ts - start) / 1200, 1);
-        const eased = 1 - Math.pow(1 - p, 3);
-        h3.textContent = Math.floor(eased * num) + suffix;
-        if (p < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    });
-  }, { threshold: 0.5 }).observe(document.querySelector('.about-stats') || document.body);
+  const statsSection = document.querySelector('.about-stats');
+  if (statsSection) {
+    new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const h3 = entry.target;
+        if (h3.dataset.counted) return;
+        const raw = h3.textContent.trim();
+        const num = parseInt(raw, 10);
+        if (Number.isNaN(num)) return;
+        h3.dataset.counted = '1';
+        const suffix = raw.replace(String(num), '');
+        let start = null;
+        const step = ts => {
+          if (!start) start = ts;
+          const p = Math.min((ts - start) / 1200, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          h3.textContent = Math.floor(eased * num) + suffix;
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+    }, { threshold: 0.5 }).observe(statsSection);
+  }
 
   // ============================================================
   // TILT EFFECT ON PROJECT CARDS (subtle 3D)

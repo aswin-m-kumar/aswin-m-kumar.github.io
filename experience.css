@@ -58,6 +58,16 @@
   font-size: 1.05rem; color: var(--text2); max-width: 520px; margin: 0 auto;
 }
 
+.exp-page-header .btn-ghost {
+  border-color: rgba(0,240,255,0.28);
+  color: var(--primary);
+  background: rgba(0,240,255,0.04);
+}
+
+.exp-page-header .btn-ghost:hover {
+  box-shadow: 0 0 0 1px rgba(255,0,85,0.3), 4px 4px 0 rgba(255,0,85,0.55);
+}
+
 /* ============================================================
    STATS ROW
    ============================================================ */
@@ -67,12 +77,13 @@
 }
 .exp-stat-pill {
   display: flex; align-items: center; gap: 0.65rem;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 50px; padding: 0.65rem 1.4rem;
-  box-shadow: 0 4px 16px var(--shadow);
+  background: linear-gradient(160deg, rgba(20,24,36,0.92), rgba(13,21,21,0.86));
+  border: 1px solid rgba(0,240,255,0.18);
+  border-radius: 10px; padding: 0.8rem 1.2rem;
+  box-shadow: 0 0 0 1px rgba(0,240,255,0.08), 0 14px 24px rgba(0,0,0,0.22);
   transition: transform 0.28s, box-shadow 0.28s;
 }
-.exp-stat-pill:hover { transform: translateY(-4px); box-shadow: 0 10px 28px var(--shadow-h); }
+.exp-stat-pill:hover { transform: translateY(-4px); box-shadow: 4px 4px 0 rgba(255,0,85,0.4); }
 .exp-stat-pill .material-icons { color: var(--primary); font-size: 1.3rem; }
 .exp-stat-num   { font-size: 1.2rem; font-weight: 700; color: var(--text); }
 .exp-stat-label { font-size: 0.8rem; color: var(--text3); font-weight: 500; }
@@ -100,7 +111,7 @@
     var(--primary) 92%,
     transparent 100%);
   transform: translateX(-50%);
-  opacity: 0.25;
+  opacity: 0.6;
 }
 
 /* Individual timeline item */
@@ -127,23 +138,23 @@
   border-radius: 50%;
   background: var(--primary);
   border: 3px solid var(--bg);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
+  box-shadow: 0 0 0 3px rgba(0,240,255,0.18), 0 0 12px rgba(0,240,255,0.25);
   transform: translateX(-50%);
   z-index: 1;
   transition: box-shadow 0.3s;
 }
 .timeline-item:hover::before {
-  box-shadow: 0 0 0 6px rgba(99,102,241,0.18);
+  box-shadow: 0 0 0 6px rgba(255,0,85,0.14), 0 0 18px rgba(0,240,255,0.32);
 }
 
 /* ============================================================
    EXPERIENCE CARD (glassmorphism)
    ============================================================ */
 .exp-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  box-shadow: 0 6px 24px var(--shadow);
+  background: linear-gradient(165deg, rgba(20,24,36,0.95), rgba(13,21,21,0.88));
+  border: 1px solid rgba(0,240,255,0.16);
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(0,240,255,0.08), 0 16px 26px rgba(0,0,0,0.22);
   overflow: hidden;
   transition: transform 0.32s cubic-bezier(0.16,1,0.3,1), box-shadow 0.32s;
   width: 100%;
@@ -152,7 +163,7 @@
 /* Gradient top bar — colour per category */
 .exp-card::before {
   content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
   background: var(--grad);
 }
 .exp-card.color-purple::before { background: linear-gradient(135deg,#6366f1,#8b5cf6); }
@@ -164,8 +175,8 @@
 .exp-card.color-red::before    { background: linear-gradient(135deg,#ef4444,#dc2626); }
 
 .exp-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 18px 48px var(--shadow-h);
+  transform: translateY(-8px) rotate(-0.5deg);
+  box-shadow: 4px 4px 0 rgba(255,0,85,0.55);
 }
 
 /* Card header row */
@@ -174,7 +185,7 @@
   padding: 1.5rem 1.75rem 1rem;
 }
 .exp-card-icon {
-  width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+  width: 52px; height: 52px; border-radius: 8px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   font-size: 1.5rem;
   background: var(--grad);
@@ -212,16 +223,16 @@
 /* Tags */
 .exp-card-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
 .exp-tag {
-  background: var(--surface2); color: var(--text2);
+  background: rgba(148,163,184,0.08); color: var(--text2);
   padding: 0.22rem 0.7rem; border-radius: 14px;
   font-size: 0.78rem; font-weight: 500;
   border: 1px solid var(--border);
   transition: background 0.2s, color 0.2s;
 }
 .exp-card:hover .exp-tag {
-  background: rgba(99,102,241,0.08);
+  background: rgba(0,240,255,0.08);
   color: var(--primary);
-  border-color: rgba(99,102,241,0.25);
+  border-color: rgba(0,240,255,0.26);
 }
 
 /* ============================================================

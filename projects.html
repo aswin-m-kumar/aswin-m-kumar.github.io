@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projects - Aswin M Kumar</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">
+          <span class="logo-text">Aswin M Kumar</span>
+        </div>
+        <div class="nav-menu">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="experience.html" class="nav-link">Experience</a>
+          <a href="skills.html" class="nav-link">Skills</a>
+          <a href="projects.html" class="nav-link active">Projects</a>
+          <a href="certificates.html" class="nav-link">Certificates</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+          <button class="theme-toggle" id="themeToggle">
+            <span class="material-icons">light_mode</span>
+          </button>
+        </div>
+        <div class="hamburger" id="hamburger">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </nav>
+
+    <main style="padding-top: 90px;">
+      <section id="projects" class="projects projects-lab-section">
+        <div class="container">
+
+          <div class="projects-sub-header projects-lab-header" data-reveal="fade-up">
+            <span class="projects-sub-label featured-label">
+              <span class="material-icons">star</span> Core Projects
+            </span>
+            <p class="projects-sub-desc">A complete snapshot of my key projects</p>
+          </div>
+          <div class="projects-grid featured-grid projects-lab-grid">
+
+            <div class="project-card featured-card" data-reveal="fade-up" data-delay="0">
+              <div class="project-icon">
+                <span class="material-icons">school</span>
+              </div>
+              <h3>InternBuddy CET (Active)</h3>
+              <p>
+                Flask + React + Vite web app for CET students to find and evaluate internships.
+                Implements Google OAuth, deployed on Vercel.
+              </p>
+              <div class="project-tags">
+                <span class="tag">Flask</span>
+                <span class="tag">React + Vite</span>
+                <span class="tag">Google OAuth</span>
+                <span class="tag">Vercel</span>
+              </div>
+              <div style="margin-top:1rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+                <a href="https://aswin-m-kumar.github.io/InternBuddy_CET" class="btn btn-secondary" target="_blank" rel="noopener">
+                  <span class="material-icons">public</span>
+                  Live
+                </a>
+                <a href="https://github.com/aswin-m-kumar/InternBuddy_CET" class="btn btn-secondary" target="_blank" rel="noopener">
+                  <span class="material-icons">open_in_new</span>
+                  GitHub
+                </a>
+              </div>
+            </div>
+
+            <div class="project-card featured-card" data-reveal="fade-up" data-delay="50">
+              <div class="project-icon">
+                <span class="material-icons">smart_toy</span>
+              </div>
+              <h3>InternAgent</h3>
+              <p>
+                AI tool that auto-generates Instagram poster content and WhatsApp captions from
+                internship URLs.
+              </p>
+              <div class="project-tags">
+                <span class="tag">Flask + BeautifulSoup</span>
+                <span class="tag">Llama 3.1 (NVIDIA NIM)</span>
+                <span class="tag">Security Hardened</span>
+              </div>
+              <div style="margin-top:1rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+                <a href="https://aswin-m-kumar.github.io/Intern_Agent" class="btn btn-secondary" target="_blank" rel="noopener">
+                  <span class="material-icons">public</span>
+                  Live
+                </a>
+                <a href="https://github.com/aswin-m-kumar/Intern_Agent" class="btn btn-secondary" target="_blank" rel="noopener">
+                  <span class="material-icons">open_in_new</span>
+                  GitHub
+                </a>
+              </div>
+            </div>
+
+            <div class="project-card featured-card" data-reveal="fade-up" data-delay="100">
+              <div class="project-icon">
+                <span class="material-icons">recycling</span>
+              </div>
+              <h3>Trash Nada</h3>
+              <p>
+                AI-driven waste management system ranked top 10 at the Satwa National Hackathon (133
+                teams). Uses machine learning to optimise waste sorting and disposal processes.
+              </p>
+              <div class="project-tags">
+                <span class="tag">AI/ML</span>
+                <span class="tag">Python</span>
+                <span class="tag">Sustainability</span>
+              </div>
+              <div style="margin-top:1rem">
+                <a href="https://drive.google.com/drive/folders/19JhuGT66JVEsUgpoyN4sNFAIDtkcsEpi?usp=drive_link"
+                   class="btn btn-secondary" target="_blank" rel="noopener">
+                  <span class="material-icons">folder_open</span>
+                  View Demo &amp; Presentation
+                </a>
+              </div>
+            </div>
+
+            <div class="project-card featured-card" data-reveal="fade-up" data-delay="150">
+              <div class="project-icon">
+                <span class="material-icons">sports_esports</span>
+              </div>
+              <h3>Orbital Dodge Game</h3>
+              <p>
+                Browser-based game using NVIDIA Inference API.
+              </p>
+              <div class="project-tags">
+                <span class="tag">JavaScript</span>
+                <span class="tag">NVIDIA Inference API</span>
+                <span class="tag">Game Dev</span>
+              </div>
+              <div style="margin-top:1rem">
+                <a href="orbital-dodge.html" class="btn btn-secondary" target="_blank" rel="noopener">
+                  <span class="material-icons">rocket_launch</span>
+                  Play Game
+                </a>
+              </div>
+            </div>
+
+            <div class="project-card featured-card" data-reveal="fade-up" data-delay="200">
+              <div class="project-icon">
+                <span class="material-icons">web</span>
+              </div>
+              <h3>Not_KTU_Results</h3>
+              <p>
+                Satirical KTU portal parody &mdash; TinkerHub Useless Projects 2.0.
+              </p>
+              <div class="project-tags">
+                <span class="tag">Web Dev</span>
+                <span class="tag">HTML/CSS</span>
+                <span class="tag">JavaScript</span>
+              </div>
+              <div style="margin-top:1rem">
+                <a href="https://aswin-m-kumar.github.io/Not_KTU_Results/" class="btn btn-secondary" target="_blank" rel="noopener">
+                  <span class="material-icons">open_in_new</span>
+                  Live Demo
+                </a>
+              </div>
+            </div>
+
+            <div class="project-card featured-card" data-reveal="fade-up" data-delay="250">
+              <div class="project-icon">
+                <span class="material-icons">electric_bolt</span>
+              </div>
+              <h3>Overhead Power Line Fault Detection</h3>
+              <p>
+                Built for KSEBL. Detects faults in overhead power lines.
+              </p>
+              <div class="project-tags">
+                <span class="tag">KSEBL</span>
+                <span class="tag">Power Systems</span>
+                <span class="tag">Fault Detection</span>
+              </div>
+            </div>
+
+            <div class="project-card featured-card" data-reveal="fade-up" data-delay="300">
+              <div class="project-icon">
+                <span class="material-icons">model_training</span>
+              </div>
+              <h3>Solar PV + MPPT Simulation (Completed)</h3>
+              <p>
+                Field-Oriented Control simulation for Permanent Magnet Synchronous Motors.
+              </p>
+              <div class="project-tags">
+                <span class="tag">Completed</span>
+                <span class="tag">38 kWp / 71 Panels</span>
+                <span class="tag">380 kWh LFP Battery</span>
+                <span class="tag">30 kW Inverter</span>
+                <span class="tag">PR = 0.75</span>
+              </div>
+              <div style="margin-top:1rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+                <a href="https://github.com/aswin-m-kumar/Solar_PV_MPPT_Simulation" class="btn btn-secondary" target="_blank" rel="noopener">
+                  <span class="material-icons">open_in_new</span>
+                  GitHub
+                </a>
+              </div>
+            </div>
+
+            <div class="project-card featured-card" data-reveal="fade-up" data-delay="400">
+              <div class="project-icon">
+                <span class="material-icons">account_tree</span>
+              </div>
+              <h3>Custom GPT / Recurrent LLM</h3>
+              <p>
+                Real recurrent architecture with shared-block recurrence, BigramHash embeddings,
+                Int6 QAT, and Muon optimizer.
+              </p>
+              <div class="project-tags">
+                <span class="tag">train_gpt.py</span>
+                <span class="tag">tiny_llm_x.py</span>
+              </div>
+            </div>
+
+            <div class="project-card featured-card" data-reveal="fade-up" data-delay="450">
+              <div class="project-icon">
+                <span class="material-icons">description</span>
+              </div>
+              <h3>ATS Resume (Auto-compiled)</h3>
+              <p>
+                LaTeX resume auto-compiled and hosted via GitHub Actions.
+              </p>
+              <div class="project-tags">
+                <span class="tag">LaTeX</span>
+                <span class="tag">GitHub Actions</span>
+                <span class="tag">CI/CD</span>
+              </div>
+              <div style="margin-top:1rem">
+                <a href="https://github.com/aswin-m-kumar/resume" class="btn btn-secondary" target="_blank" rel="noopener">
+                  <span class="material-icons">open_in_new</span>
+                  GitHub
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="projects-sub-header projects-lab-header" style="margin-top:3.5rem" data-reveal="fade-up">
+            <span class="projects-sub-label auto-label">
+              <span class="material-icons">sync</span> Other Projects
+            </span>
+            <p class="projects-sub-desc">Pulled live from my GitHub &mdash; always up to date</p>
+          </div>
+          <div class="projects-grid" id="auto-projects-container"></div>
+
+          <div class="currently-working-banner projects-lab-banner" data-reveal="fade-up" data-delay="120">
+            <div class="cwb-icon">
+              <span class="material-icons">construction</span>
+            </div>
+            <div class="cwb-text">
+              <span class="cwb-label">Currently Working On</span>
+              <h3 class="cwb-title">PMSM FOC Simulation</h3>
+              <p class="cwb-desc">
+                Designing a Field-Oriented Control simulation for a Permanent Magnet Synchronous Motor
+                in MATLAB/Simulink &mdash; structured across Mission 0&ndash;5 gated milestones, using the
+                ode23tb solver and 10&nbsp;kHz PWM switching frequency for high-fidelity motor drive
+                modelling.
+              </p>
+            </div>
+            <div class="cwb-status">
+              <span class="status-dot"></span>
+              In Progress
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <section id="fun-zone" class="fun-zone-section projects-lab-fun-zone">
+        <div class="container">
+          <h2 class="section-title" data-reveal="fade-up">Fun Zone</h2>
+          <p class="section-description" data-reveal="fade-up" data-delay="80">
+            I enjoy building interactive projects. Take a break and try one of my games!
+          </p>
+          <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;"
+               data-reveal="zoom" data-delay="160">
+            <a href="game.html" class="btn btn-primary">
+              Play Circuit Master <span class="material-icons">memory</span>
+            </a>
+            <a href="orbital-dodge.html" class="btn btn-primary">
+              Play Orbital Dodge <span class="material-icons">rocket_launch</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <p>&copy; 2025 Aswin M Kumar. Built with passion and code.</p>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
