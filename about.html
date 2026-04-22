@@ -4,172 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>About - Aswin M Kumar</title>
-    <script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              "surface": "#0d1515",
-              "surface-container": "#192122",
-              "surface-container-low": "#151d1e",
-              "surface-container-high": "#232b2c",
-              "on-surface": "#dce4e5",
-              "on-surface-variant": "#b9cacb",
-              "outline-variant": "#3b494b",
-              "plasma-cyan": "#00f0ff",
-              "threat-red": "#ff0055",
-              "federation-steel": "#141824",
-              "void-black": "#0a0b10",
-              "starlight-white": "#e2e8f0",
-            },
-            fontFamily: {
-              "h1": ["Space Grotesk"],
-              "h2": ["Space Grotesk"],
-              "body-md": ["Plus Jakarta Sans"],
-              "body-lg": ["Plus Jakarta Sans"],
-              "label-code": ["Space Grotesk"],
-            },
-            fontSize: {
-              "label-code": ["14px", { lineHeight: "1.4", letterSpacing: "0.05em", fontWeight: "500" }],
-              "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "500" }],
-              "h2": ["32px", { lineHeight: "1.3", fontWeight: "700" }],
-              "h1": ["48px", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "800" }],
-            },
-            spacing: {
-              "container-max": "1200px",
-            }
-          }
-        }
-      }
-    </script>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <title>About - Aswin M Kumar</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <style>
-      .material-symbols-outlined {
-        font-family: 'Material Symbols Outlined';
-        font-variation-settings: 'FILL' 1;
-      }
-      .segmented-meter {
-        background-image: repeating-linear-gradient(
-          to right,
-          transparent,
-          transparent 8px,
-          #0d1515 8px,
-          #0d1515 12px
-        );
-        z-index: 10;
-      }
-      .spring-bounce {
-        transition: all 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
-      .glass-pod {
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-      }
-      .about-lab-main {
-        max-width: 1200px;
-        padding-top: 8.5rem;
-        padding-bottom: 6rem;
+      .about-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
         gap: 1.5rem;
+        margin-top: 2rem;
       }
-      .about-lab-header {
-        border-left: 4px solid #ff0055;
-        padding-left: 1.5rem;
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
+      .col-12 { grid-column: span 12; }
+      .col-4 { grid-column: span 4; }
+      @media (max-width: 768px) {
+        .col-4 { grid-column: span 12; }
       }
-      .about-lab-header h1 {
-        text-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
-      }
-      .about-lab-grid {
-        gap: 24px;
-      }
-      .about-lab-pod {
-        position: relative;
-        overflow: hidden;
-        border-radius: 0.25rem;
-      }
-      .about-lab-pod::before {
-        content: '';
-        position: absolute;
-        right: -5rem;
-        top: -5rem;
-        width: 16rem;
-        height: 16rem;
-        border-radius: 9999px;
-        background: rgba(0, 240, 255, 0.08);
-        filter: blur(42px);
-        pointer-events: none;
-        transition: background 500ms;
-      }
-      .about-lab-pod:hover::before {
-        background: rgba(0, 240, 255, 0.16);
-      }
-      .about-lab-card {
-        border: 1px solid rgba(59, 73, 75, 0.8);
-        background: rgba(25, 33, 34, 0.5);
-        transition: all 250ms ease;
-      }
-      .about-lab-card:hover {
-        background: rgba(51, 59, 59, 0.5);
-      }
-      .about-lab-link {
-        display: block;
-        transition: all 250ms ease;
-      }
-      .about-lab-link:hover {
-        border-color: #00f0ff;
-        transform: translateY(-2px);
-      }
-      .about-lab-chip {
-        transition: all 200ms ease;
-      }
-      .about-lab-chip:hover {
-        transform: translateY(-2px);
-      }
-      .about-lab-directive {
-        background: linear-gradient(135deg, rgba(25,33,34,0.9) 0%, rgba(13,21,21,0.95) 100%);
-      }
-      .glitch-effect {
-        position: relative;
-      }
-      .glitch-effect::before,
-      .glitch-effect::after {
-        content: attr(data-text);
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
-      .glitch-effect::before {
-        animation: glitch-1 2s infinite linear alternate-reverse;
-        clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-        transform: translateX(-2px);
-      }
-      .glitch-effect::after {
-        animation: glitch-2 3s infinite linear alternate-reverse;
-        clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
-        transform: translateX(2px);
-      }
-      @keyframes glitch-1 {
-        0%, 100% { transform: translateX(0); }
-        20% { transform: translateX(-3px); }
-        40% { transform: translateX(3px); }
-        60% { transform: translateX(-1px); }
-        80% { transform: translateX(2px); }
-      }
-      @keyframes glitch-2 {
-        0%, 100% { transform: translateX(0); }
-        20% { transform: translateX(3px); }
-        40% { transform: translateX(-2px); }
-        60% { transform: translateX(1px); }
-        80% { transform: translateX(-3px); }
-      }
+    </style>
     </style>
   </head>
   <body class="bg-surface text-on-surface min-h-screen flex flex-col font-body-md overflow-x-hidden selection:bg-threat-red selection:text-white">
@@ -199,144 +51,96 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="about-lab-main flex-grow w-full mx-auto px-6 flex flex-col">
+    <main class="container flex-grow" style="padding-top: 100px; padding-bottom: 60px;">
 
-      <!-- Header -->
-      <header class="about-lab-header flex flex-col gap-4">
-        <div class="font-label-code text-label-code text-plasma-cyan flex items-center gap-2">
-          <span class="material-symbols-outlined text-[18px]">fingerprint</span>
-          &gt; INITIATING_PROFILE_SCAN
-        </div>
-        <h1 class="font-h1 text-h1 text-white uppercase tracking-tighter drop-shadow-[0_0_8px_rgba(0,240,255,0.3)] glitch-effect" data-text="SUBJECT_PROFILE">
-          SUBJECT_PROFILE
-        </h1>
+      <!-- Header Section -->
+      <header class="section-header" style="margin-bottom: 3rem;">
+        <p class="hero-subtitle">&gt; INITIATING_PROFILE_SCAN</p>
+        <h1 class="hero-title glitch-effect" data-text="SUBJECT_PROFILE">SUBJECT_PROFILE</h1>
       </header>
 
-      <!-- Bento Grid -->
-      <div class="about-lab-grid grid grid-cols-1 md:grid-cols-12">
+      <div class="about-grid">
 
-        <!-- Bio Pod (Full Width) -->
-        <article class="about-lab-pod col-span-1 md:col-span-12 glass-pod bg-surface-container-low/60 border border-federation-steel p-8 spring-bounce hover:-rotate-1 hover:border-plasma-cyan group relative overflow-hidden">
-          <div class="absolute -right-20 -top-20 w-64 h-64 bg-plasma-cyan/10 rounded-full blur-3xl group-hover:bg-plasma-cyan/20 transition-colors duration-500 pointer-events-none"></div>
-          <h2 class="font-label-code text-label-code text-outline-variant mb-4 flex items-center gap-2 uppercase">
-            <span class="material-symbols-outlined text-[16px]">bio</span>
-            Subject_Brief
-          </h2>
-          <p class="font-body-lg text-body-lg text-on-surface/90 max-w-4xl relative z-10 leading-relaxed">
-            EEE undergrad at <strong class="text-plasma-cyan">College of Engineering Trivandrum (CET)</strong>, operating at the intersection of <span class="text-threat-red">hardware and software</span>. Building everything from PMSM motor drives and off-grid solar systems to AI-powered web apps and browser games. Currently developing <span class="text-plasma-cyan">InternBuddy CET</span> and obsessing over embedded systems + ML integration.
-          </p>
+        <!-- Bio Section -->
+        <article class="hero-text col-12" data-reveal="fade-up">
+            <h2 class="hero-subtitle" style="margin-bottom: 1.5rem;">
+                <span class="material-icons" style="vertical-align: middle; font-size: 1.2rem; margin-right: 0.5rem;">fingerprint</span>
+                Subject_Brief
+            </h2>
+            <p class="hero-description" style="text-align: left; margin: 0; font-size: 1.2rem;">
+                EEE undergrad at <strong style="color: var(--primary);">College of Engineering Trivandrum (CET)</strong>, operating at the intersection of <span style="color: var(--secondary);">hardware and software</span>. Building everything from PMSM motor drives and off-grid solar systems to AI-powered web apps and browser games. Currently developing <span style="color: var(--primary);">InternBuddy CET</span> and obsessing over embedded systems + ML integration.
+            </p>
         </article>
 
-        <!-- Identity Stats - 4 columns -->
-        <div class="about-lab-pod col-span-1 md:col-span-4 glass-pod bg-surface-container-high/40 border border-federation-steel p-6 spring-bounce hover:rotate-1 hover:border-plasma-cyan flex flex-col gap-4">
-          <h2 class="font-label-code text-label-code text-plasma-cyan flex items-center gap-2 uppercase">
-            <span class="material-symbols-outlined text-[16px]">badge</span>
-            Identity_Matrix
-          </h2>
-          <div class="flex flex-col gap-3 mt-2">
-            <div class="about-lab-card p-4 hover:bg-surface-bright/50 transition-colors">
-              <div class="font-label-code text-label-code text-plasma-cyan mb-1">&gt; ACADEMIC_LEVEL</div>
-              <div class="font-body-md text-body-md text-on-surface-variant text-sm">S6 — EEE Department</div>
+        <!-- Matrix Grids -->
+        <div class="floating-card col-4" data-reveal="fade-up" style="animation-delay: 0.1s;">
+            <div class="card-content">
+                <span class="material-icons">badge</span>
+                <h3>Identity_Matrix</h3>
+                <div class="hero-terminal" style="margin-top: 1.5rem; text-align: left;">
+                    <p><span>&gt;</span> LEVEL: S6 — EEE</p>
+                    <p><span>&gt;</span> INST: CET, KTU</p>
+                    <p><span>&gt;</span> PROJECTS: 10+ Deployed</p>
+                </div>
             </div>
-            <div class="about-lab-card p-4 hover:bg-surface-bright/50 transition-colors">
-              <div class="font-label-code text-label-code text-plasma-cyan mb-1">&gt; INSTITUTION</div>
-              <div class="font-body-md text-body-md text-on-surface-variant text-sm">CET, KTU University</div>
-            </div>
-            <div class="about-lab-card p-4 hover:bg-surface-bright/50 transition-colors">
-              <div class="font-label-code text-label-code text-plasma-cyan mb-1">&gt; PROJECT_COUNT</div>
-              <div class="font-body-md text-body-md text-on-surface-variant text-sm">10+ Deployed Systems</div>
-            </div>
-          </div>
         </div>
 
-        <!-- Known Affiliations - 4 columns -->
-        <div class="about-lab-pod col-span-1 md:col-span-4 glass-pod bg-surface-container-high/40 border border-federation-steel p-6 spring-bounce hover:-rotate-1 hover:border-threat-red flex flex-col gap-4">
-          <h2 class="font-label-code text-label-code text-threat-red flex items-center gap-2 uppercase">
-            <span class="material-symbols-outlined text-[16px]">hub</span>
-            Known_Affiliations
-          </h2>
-          <ul class="flex flex-col gap-3 mt-2">
-            <li class="about-lab-card p-4 hover:bg-surface-bright/50 transition-colors">
-              <div class="font-label-code text-label-code text-plasma-cyan mb-1">&gt; SAEINDIA_CET</div>
-              <div class="font-body-md text-body-md text-on-surface-variant text-sm">Mechanical Synthesis &amp; Systems Architecture</div>
-            </li>
-            <li class="about-lab-card p-4 hover:bg-surface-bright/50 transition-colors">
-              <div class="font-label-code text-label-code text-plasma-cyan mb-1">&gt; INTERNSHIP_CELL_PR</div>
-              <div class="font-body-md text-body-md text-on-surface-variant text-sm">External Comms &amp; Diplomatic Cover</div>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Contact Uplink - 4 columns -->
-        <div class="about-lab-pod col-span-1 md:col-span-4 glass-pod bg-surface-container-high/40 border border-federation-steel p-6 spring-bounce hover:rotate-1 hover:border-plasma-cyan flex flex-col gap-4">
-          <h2 class="font-label-code text-label-code text-plasma-cyan flex items-center gap-2 uppercase">
-            <span class="material-symbols-outlined text-[16px]">satellite</span>
-            Contact_Uplink
-          </h2>
-          <div class="flex flex-col gap-3 mt-2">
-            <a href="mailto:aswin2k03.mk@gmail.com" class="about-lab-link p-4 border border-outline-variant/50 bg-surface-container/50 hover:bg-surface-bright/50 hover:border-plasma-cyan transition-all group/link">
-              <div class="font-label-code text-label-code text-plasma-cyan mb-1 flex items-center gap-2">
-                <span class="material-symbols-outlined text-[14px]">email</span>
-                &gt; EMAIL_UPLINK
-              </div>
-              <div class="font-body-md text-body-md text-on-surface-variant text-sm group-hover/link:text-plasma-cyan transition-colors">aswin2k03.mk@gmail.com</div>
-            </a>
-            <a href="https://github.com/aswin-m-kumar" target="_blank" class="about-lab-link p-4 border border-outline-variant/50 bg-surface-container/50 hover:bg-surface-bright/50 hover:border-plasma-cyan transition-all group/link">
-              <div class="font-label-code text-label-code text-plasma-cyan mb-1 flex items-center gap-2">
-                <span class="material-symbols-outlined text-[14px]">code</span>
-                &gt; GITHUB_REPOSITORY
-              </div>
-              <div class="font-body-md text-body-md text-on-surface-variant text-sm group-hover/link:text-plasma-cyan transition-colors">github.com/aswin-m-kumar</div>
-            </a>
-            <a href="https://aswin-m-kumar.github.io" target="_blank" class="about-lab-link p-4 border border-outline-variant/50 bg-surface-container/50 hover:bg-surface-bright/50 hover:border-plasma-cyan transition-all group/link">
-              <div class="font-label-code text-label-code text-plasma-cyan mb-1 flex items-center gap-2">
-                <span class="material-symbols-outlined text-[14px]">public</span>
-                &gt; PORTAL_ADDRESS
-              </div>
-              <div class="font-body-md text-body-md text-on-surface-variant text-sm group-hover/link:text-plasma-cyan transition-colors">aswin-m-kumar.github.io</div>
-            </a>
-          </div>
-        </div>
-
-        <!-- Interest Matrix (Full Width) -->
-        <div class="about-lab-pod col-span-1 md:col-span-12 glass-pod bg-surface-container-high/40 border border-federation-steel p-6 spring-bounce hover:-rotate-1 hover:border-plasma-cyan">
-          <h2 class="font-label-code text-label-code text-plasma-cyan flex items-center gap-2 uppercase mb-4">
-            <span class="material-symbols-outlined text-[16px]">category</span>
-            Interest_Matrix
-          </h2>
-          <div class="flex flex-wrap gap-3 mt-2">
-            <span class="about-lab-chip px-4 py-2 border border-plasma-cyan/50 text-plasma-cyan font-label-code text-label-code bg-plasma-cyan/10 hover:bg-plasma-cyan/20 hover:border-plasma-cyan transition-all cursor-default">Embedded Systems</span>
-            <span class="about-lab-chip px-4 py-2 border border-threat-red/50 text-threat-red font-label-code text-label-code bg-threat-red/10 hover:bg-threat-red/20 hover:border-threat-red transition-all cursor-default">AI/ML</span>
-            <span class="about-lab-chip px-4 py-2 border border-plasma-cyan/50 text-plasma-cyan font-label-code text-label-code bg-plasma-cyan/10 hover:bg-plasma-cyan/20 hover:border-plasma-cyan transition-all cursor-default">Cybersecurity</span>
-            <span class="about-lab-chip px-4 py-2 border border-plasma-cyan/50 text-plasma-cyan font-label-code text-label-code bg-plasma-cyan/10 hover:bg-plasma-cyan/20 hover:border-plasma-cyan transition-all cursor-default">PCB Design</span>
-            <span class="about-lab-chip px-4 py-2 border border-plasma-cyan/50 text-plasma-cyan font-label-code text-label-code bg-plasma-cyan/10 hover:bg-plasma-cyan/20 hover:border-plasma-cyan transition-all cursor-default">Flutter</span>
-            <span class="about-lab-chip px-4 py-2 border border-plasma-cyan/50 text-plasma-cyan font-label-code text-label-code bg-plasma-cyan/10 hover:bg-plasma-cyan/20 hover:border-plasma-cyan transition-all cursor-default">UI/UX</span>
-            <span class="about-lab-chip px-4 py-2 border border-threat-red/50 text-threat-red font-label-code text-label-code bg-threat-red/10 hover:bg-threat-red/20 hover:border-threat-red transition-all cursor-default">Browser Game Dev</span>
-            <span class="about-lab-chip px-4 py-2 border border-plasma-cyan/50 text-plasma-cyan font-label-code text-label-code bg-plasma-cyan/10 hover:bg-plasma-cyan/20 hover:border-plasma-cyan transition-all cursor-default">Power Electronics</span>
-            <span class="about-lab-chip px-4 py-2 border border-plasma-cyan/50 text-plasma-cyan font-label-code text-label-code bg-plasma-cyan/10 hover:bg-plasma-cyan/20 hover:border-plasma-cyan transition-all cursor-default">Motor Drives</span>
-            <span class="about-lab-chip px-4 py-2 border border-plasma-cyan/50 text-plasma-cyan font-label-code text-label-code bg-plasma-cyan/10 hover:bg-plasma-cyan/20 hover:border-plasma-cyan transition-all cursor-default">Solar Energy</span>
-          </div>
-        </div>
-
-        <!-- Current Directive (Full Width) -->
-        <div class="about-lab-directive about-lab-pod col-span-1 md:col-span-12 glass-pod border border-federation-steel spring-bounce hover:-rotate-1 hover:border-threat-red group relative overflow-hidden">
-          <div class="relative z-10 p-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-            <div class="flex flex-col gap-4 max-w-2xl">
-              <h2 class="font-label-code text-label-code text-plasma-cyan flex items-center gap-2 uppercase">
-                <span class="material-symbols-outlined text-[16px]">target</span>
-                Current_Directive
-              </h2>
-              <h3 class="font-h2 text-h2 text-white">InternBuddy CET + Embedded Systems + ML Integration</h3>
-              <p class="font-body-md text-body-md text-on-surface-variant">
-                Executing advanced projects at the convergence of embedded hardware and intelligent software. Building tools that bridge the gap between academic learning and industry readiness while pushing the boundaries of what's possible with limited resources.
-              </p>
+        <div class="floating-card col-4" data-reveal="fade-up" style="animation-delay: 0.2s;">
+            <div class="card-content">
+                <span class="material-icons">hub</span>
+                <h3>Known_Affiliations</h3>
+                <div class="hero-terminal" style="margin-top: 1.5rem; text-align: left;">
+                    <p><span>&gt;</span> SAEINDIA_CET</p>
+                    <p><span>&gt;</span> INTERNSHIP_CELL_PR</p>
+                </div>
             </div>
-            <div class="flex-shrink-0 animate-pulse">
-              <div class="px-4 py-2 border border-threat-red text-threat-red font-label-code text-label-code bg-threat-red/10">
-                [ ACTIVE_OPERATION ]
-              </div>
+        </div>
+
+        <div class="floating-card col-4" data-reveal="fade-up" style="animation-delay: 0.3s;">
+            <div class="card-content">
+                <span class="material-icons">satellite</span>
+                <h3>Contact_Uplink</h3>
+                <div class="hero-terminal" style="margin-top: 1.5rem; text-align: left;">
+                    <p><span>&gt;</span> <a href="mailto:aswin2k03.mk@gmail.com" style="color: inherit; text-decoration: none;">Email: aswin2k03.mk@gmail.com</a></p>
+                    <p><span>&gt;</span> <a href="https://github.com/aswin-m-kumar" style="color: inherit; text-decoration: none;">GitHub: aswin-m-kumar</a></p>
+                    <p><span>&gt;</span> <a href="https://aswin-m-kumar.github.io" style="color: inherit; text-decoration: none;">Web: aswin-m-kumar.github.io</a></p>
+                </div>
             </div>
-          </div>
+        </div>
+
+        <!-- Interest Matrix -->
+        <div class="hero-text col-12" data-reveal="fade-up" style="margin-top: 1.5rem;">
+            <h2 class="hero-subtitle" style="margin-bottom: 1rem;">Interest_Matrix</h2>
+            <div class="project-tags" style="justify-content: flex-start;">
+                <span class="tag">Embedded Systems</span>
+                <span class="tag">AI/ML</span>
+                <span class="tag">Cybersecurity</span>
+                <span class="tag">PCB Design</span>
+                <span class="tag">Flutter</span>
+                <span class="tag">UI/UX</span>
+                <span class="tag">Browser Game Dev</span>
+                <span class="tag">Power Electronics</span>
+                <span class="tag">Motor Drives</span>
+                <span class="tag">Solar Energy</span>
+            </div>
+        </div>
+
+        <!-- Current Directive -->
+        <div class="hero-text col-12" data-reveal="fade-up" style="border-color: var(--secondary); background: linear-gradient(160deg, rgba(255,0,85,0.05), rgba(10,11,16,0.8));">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h2 class="hero-subtitle" style="color: var(--secondary);">Current_Directive</h2>
+                    <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: #fff;">InternBuddy CET + Embedded Systems + ML Integration</h3>
+                    <p style="color: var(--text2); margin-top: 0.5rem; max-width: 800px;">
+                        Executing advanced projects at the convergence of embedded hardware and intelligent software. 
+                        Building tools that bridge the gap between academic learning and industry readiness.
+                    </p>
+                </div>
+                <div class="cwb-status" style="align-self: center;">
+                    <span class="status-dot"></span>
+                    ACTIVE_OPERATION
+                </div>
+            </div>
         </div>
 
       </div>
