@@ -1554,6 +1554,9 @@ body {
     gap: 0.85rem;
     margin-top: 0.25rem;
     margin-bottom: 0;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
   }
 
   .hero-side .hero-image-placeholder,
@@ -1587,18 +1590,25 @@ body {
   }
 
   .hero-visual {
+    display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     gap: 0.85rem;
     align-items: stretch;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
   }
 
   .floating-card {
+    display: block;
     width: 100%;
     flex-basis: auto;
     padding: 1.15rem;
     animation: none;
     transform: none;
+    opacity: 1;
+    visibility: visible;
   }
 }
 
