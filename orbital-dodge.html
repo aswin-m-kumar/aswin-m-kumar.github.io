@@ -231,6 +231,14 @@
         font-weight: 700;
         padding: 0.45rem 0.6rem;
       }
+      .low-quality-ui .hud-pill,
+      .low-quality-ui .hud-button,
+      .low-quality-ui .help-chip,
+      .low-quality-ui .stage-flavor {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
     </style>
   </head>
   <body
@@ -286,7 +294,9 @@
 
     <script>
       const canvas = document.getElementById("gameCanvas");
-      const ctx = canvas.getContext("2d");
+      const ctx =
+        canvas.getContext("2d", { alpha: false, desynchronized: true }) ||
+        canvas.getContext("2d");
 
       // UI Elements
       const scoreEl = document.getElementById("score");
@@ -329,6 +339,8 @@
       let stageFlavorTimer, stageFlavorDuration, lastStageAnnounced;
       let runStartTime, finalRunMs, shareSnapshotDataUrl, lastDeathLine;
       let qualityMode, activeQuality, qualityPreset, renderScale;
+      let adaptiveEffectScale, adaptiveSpawnDelayScale;
+      let frameSampleTotalMs, frameSampleCount;
       let audioCtx, audioMaster;
 
       const COMBO_RESET_MS = 2000;
@@ -342,7 +354,11 @@
         low: {
           renderScale: 0.8,
           starDensity: 0.58,
-          blurScale: 0.52,
+          blurScale: 0,
+          glowEnabled: false,
+          trailAlpha: 0,
+          maxProjectiles: 18,
+          spawnDelayScale: 1.18,
           maxParticles: 110,
           particleSpawnScale: 0.6,
           maxFloatingTexts: 8,
@@ -354,6 +370,10 @@
           renderScale: 0.92,
           starDensity: 0.8,
           blurScale: 0.78,
+          glowEnabled: true,
+          trailAlpha: 0.2,
+          maxProjectiles: 28,
+          spawnDelayScale: 1.06,
           maxParticles: 165,
           particleSpawnScale: 0.85,
           maxFloatingTexts: 12,
@@ -365,6 +385,10 @@
           renderScale: 1,
           starDensity: 1,
           blurScale: 1,
+          glowEnabled: true,
+          trailAlpha: 0.25,
+          maxProjectiles: 40,
+          spawnDelayScale: 1,
           maxParticles: 240,
           particleSpawnScale: 1,
           maxFloatingTexts: 18,
@@ -389,7 +413,7 @@
         const cores = navigator.hardwareConcurrency || 4;
         const memory = navigator.deviceMemory || 4;
         const mobile = isLikelyMobile();
-        if (mobile && (cores <= 6 || memory <= 4)) return "low";
+        if (mobile && (cores <= 8 || memory <= 6)) return "low";
         if (mobile) return "medium";
         return "high";
       }
@@ -408,8 +432,13 @@
         qualityMode = mode;
         localStorage.setItem("orbitalDodgeQualityMode", qualityMode);
         activeQuality = mode === "auto" ? detectAutoQualityMode() : mode;
-        qualityPreset = QUALITY_PRESETS[activeQuality] || QUALITY_PRESETS.medium;
+        qualityPreset =
+          QUALITY_PRESETS[activeQuality] || QUALITY_PRESETS.medium;
         renderScale = qualityPreset.renderScale;
+        document.body.classList.toggle(
+          "low-quality-ui",
+          activeQuality === "low",
+        );
 
         const oldCenter = center || {
           x: window.innerWidth / 2,
@@ -440,7 +469,8 @@
 
       function cycleQualityMode() {
         const currentIndex = QUALITY_ORDER.indexOf(qualityMode || "auto");
-        const nextMode = QUALITY_ORDER[(currentIndex + 1) % QUALITY_ORDER.length];
+        const nextMode =
+          QUALITY_ORDER[(currentIndex + 1) % QUALITY_ORDER.length];
         applyQualityMode(nextMode);
       }
 
@@ -479,6 +509,10 @@
         applyQualityMode(qualityMode || "auto", true);
         isGameOver = false;
         isPaused = false;
+        adaptiveEffectScale = 1;
+        adaptiveSpawnDelayScale = 1;
+        frameSampleTotalMs = 0;
+        frameSampleCount = 0;
         hasShield = false;
         score = 0;
         stage = MIN_STAGE;
@@ -528,6 +562,7 @@
         const delta = deltaMs / 16.67;
         lastFrame = timestamp;
         animationId = requestAnimationFrame(animate);
+        updateAdaptivePerformance(deltaMs);
 
         spawnTimer += deltaMs;
         powerUpTimer += deltaMs;
@@ -562,19 +597,29 @@
 
         const shakeOffset = getShakeOffset(deltaMs);
         ctx.setTransform(1, 0, 0, 1, shakeOffset.x, shakeOffset.y);
-        ctx.fillStyle = "rgba(10, 10, 10, 0.25)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const trailAlpha =
+          (qualityPreset.trailAlpha || 0) * adaptiveEffectScale;
+        if (trailAlpha <= 0.02) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        } else {
+          ctx.fillStyle = `rgba(10, 10, 10, ${Math.min(0.3, trailAlpha).toFixed(3)})`;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
         drawStars(delta);
 
         const pulse = (Math.sin(timestamp / 800) + 1) / 2;
         const pulseRadius = 8 + pulse * 6;
-        const pulseBlur = (10 + pulse * 15) * qualityPreset.blurScale;
+        const pulseBlur = qualityPreset.glowEnabled
+          ? (10 + pulse * 15) * qualityPreset.blurScale * adaptiveEffectScale
+          : 0;
         ctx.beginPath();
         ctx.arc(center.x, center.y, pulseRadius, 0, Math.PI * 2, false);
         ctx.fillStyle = "#fff5c0";
         ctx.globalAlpha = 0.55 + pulse * 0.4;
-        ctx.shadowColor = "#fff5c0";
-        ctx.shadowBlur = pulseBlur;
+        if (pulseBlur > 0.1) {
+          ctx.shadowColor = "#fff5c0";
+          ctx.shadowBlur = pulseBlur;
+        }
         ctx.fill();
         ctx.globalAlpha = 1;
         ctx.shadowBlur = 0;
@@ -605,7 +650,7 @@
                 "Shield Used",
                 "#67e8f9",
               );
-              projectiles.splice(index, 1);
+              swapPop(projectiles, index);
               continue;
             }
             endGame();
@@ -636,7 +681,7 @@
             projectile.y + projectile.size < 0 ||
             projectile.y - projectile.size > canvas.height
           ) {
-            projectiles.splice(index, 1);
+            swapPop(projectiles, index);
             updateScore(10);
           }
         }
@@ -652,9 +697,9 @@
             burst(powerUp.x, powerUp.y, "#22d3ee", 16);
             addFloatingText(powerUp.x, powerUp.y - 18, "+Shield", "#67e8f9");
             playShieldSound();
-            powerUps.splice(index, 1);
+            swapPop(powerUps, index);
           } else if (powerUp.age > 7500) {
-            powerUps.splice(index, 1);
+            swapPop(powerUps, index);
           }
         }
 
@@ -669,7 +714,9 @@
 
       function drawStars(delta) {
         ctx.save();
-        stars.forEach((star) => {
+        const starStep = adaptiveEffectScale < 0.72 ? 2 : 1;
+        for (let i = 0; i < stars.length; i += starStep) {
+          const star = stars[i];
           const layerDrift =
             star.layer === 0 ? 0.3 : star.layer === 1 ? 0.7 : 1.2;
           const layerAlpha =
@@ -687,7 +734,7 @@
           ctx.beginPath();
           ctx.arc(star.x, star.y, star.radius * layerRadius, 0, Math.PI * 2);
           ctx.fill();
-        });
+        }
         ctx.globalAlpha = 1;
         ctx.restore();
       }
@@ -696,8 +743,13 @@
         ctx.beginPath();
         ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2, false);
         ctx.fillStyle = player.color;
-        ctx.shadowColor = player.color;
-        ctx.shadowBlur = 15 * qualityPreset.blurScale;
+        const blur = qualityPreset.glowEnabled
+          ? 15 * qualityPreset.blurScale * adaptiveEffectScale
+          : 0;
+        if (blur > 0.1) {
+          ctx.shadowColor = player.color;
+          ctx.shadowBlur = blur;
+        }
         ctx.fill();
         ctx.shadowBlur = 0;
 
@@ -743,8 +795,13 @@
           ctx.translate(this.x, this.y);
           ctx.rotate(this.angle);
           ctx.fillStyle = this.color;
-          ctx.shadowColor = this.color;
-          ctx.shadowBlur = 10 * qualityPreset.blurScale;
+          const blur = qualityPreset.glowEnabled
+            ? 10 * qualityPreset.blurScale * adaptiveEffectScale
+            : 0;
+          if (blur > 0.1) {
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = blur;
+          }
           ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
           ctx.shadowBlur = 0;
           ctx.restore();
@@ -785,6 +842,7 @@
       }
 
       function spawnProjectile() {
+        if (projectiles.length >= getMaxProjectiles()) return;
         const size = Math.random() * 18 + 10 + Math.min(stage, 6);
         const color = "#ff4d4d";
         let x, y;
@@ -803,9 +861,19 @@
         };
         const spin = (Math.random() - 0.5) * 0.08;
         projectiles.push(new Projectile(x, y, velocity, size, color, spin));
-        if (stage >= 5 && Math.random() < 0.22) {
+        if (
+          stage >= 5 &&
+          projectiles.length < getMaxProjectiles() &&
+          Math.random() < 0.22 * adaptiveEffectScale
+        ) {
           setTimeout(() => {
-            if (!isGameOver && !isPaused) spawnProjectile();
+            if (
+              !isGameOver &&
+              !isPaused &&
+              projectiles.length < getMaxProjectiles()
+            ) {
+              spawnProjectile();
+            }
           }, 180);
         }
       }
@@ -822,7 +890,16 @@
       }
 
       function getSpawnDelay() {
-        return Math.max(360, 980 - stage * 70);
+        return (
+          Math.max(360, 980 - stage * 70) *
+          (qualityPreset.spawnDelayScale || 1) *
+          adaptiveSpawnDelayScale
+        );
+      }
+
+      function getMaxProjectiles() {
+        const base = qualityPreset.maxProjectiles || 28;
+        return Math.max(8, Math.floor(base * adaptiveEffectScale));
       }
 
       function burst(x, y, color, count) {
@@ -854,7 +931,7 @@
           p.y += p.vy * delta;
           p.life -= 0.035 * delta;
           if (p.life <= 0) {
-            particles.splice(i, 1);
+            swapPop(particles, i);
             continue;
           }
           ctx.globalAlpha = p.life;
@@ -869,7 +946,10 @@
       function addFloatingText(x, y, text, color) {
         floatingTexts.push({ x, y, text, color, life: 1, rise: 0 });
         if (floatingTexts.length > qualityPreset.maxFloatingTexts) {
-          floatingTexts.splice(0, floatingTexts.length - qualityPreset.maxFloatingTexts);
+          floatingTexts.splice(
+            0,
+            floatingTexts.length - qualityPreset.maxFloatingTexts,
+          );
         }
       }
 
@@ -882,18 +962,55 @@
           popup.rise += 0.9 * delta;
           popup.life -= 0.04 * delta;
           if (popup.life <= 0) {
-            floatingTexts.splice(i, 1);
+            swapPop(floatingTexts, i);
             continue;
           }
           ctx.globalAlpha = Math.max(0, popup.life);
           ctx.fillStyle = popup.color;
-          ctx.shadowColor = popup.color;
-          ctx.shadowBlur = 8;
+          if (qualityPreset.glowEnabled && adaptiveEffectScale > 0.8) {
+            ctx.shadowColor = popup.color;
+            ctx.shadowBlur = 8 * adaptiveEffectScale;
+          }
           ctx.fillText(popup.text, popup.x, popup.y - popup.rise);
         }
         ctx.globalAlpha = 1;
         ctx.shadowBlur = 0;
         ctx.restore();
+      }
+
+      function updateAdaptivePerformance(deltaMs) {
+        if (!isLikelyMobile() || qualityMode !== "auto") {
+          adaptiveEffectScale = 1;
+          adaptiveSpawnDelayScale = 1;
+          frameSampleTotalMs = 0;
+          frameSampleCount = 0;
+          return;
+        }
+        frameSampleTotalMs += deltaMs;
+        frameSampleCount += 1;
+        if (frameSampleCount < 24) return;
+
+        const avgDelta = frameSampleTotalMs / frameSampleCount;
+        frameSampleTotalMs = 0;
+        frameSampleCount = 0;
+
+        if (avgDelta > 23) {
+          adaptiveEffectScale = Math.max(0.58, adaptiveEffectScale - 0.08);
+          adaptiveSpawnDelayScale = Math.min(
+            1.55,
+            adaptiveSpawnDelayScale + 0.08,
+          );
+        } else if (avgDelta < 17.5) {
+          adaptiveEffectScale = Math.min(1, adaptiveEffectScale + 0.04);
+          adaptiveSpawnDelayScale = Math.max(1, adaptiveSpawnDelayScale - 0.05);
+        }
+      }
+
+      function swapPop(arr, index) {
+        const last = arr.length - 1;
+        if (index < 0 || index > last) return;
+        if (index !== last) arr[index] = arr[last];
+        arr.pop();
       }
 
       function addShake(intensity, durationMs) {
@@ -1049,7 +1166,15 @@
         const panStart = Math.random() * 1.2 - 0.6;
         const panEnd = -panStart;
         if (qualityPreset.audioLevel <= 1) {
-          createTone("triangle", 280, 420, 0.1, 0.035, panStart * 0.6, panEnd * 0.6);
+          createTone(
+            "triangle",
+            280,
+            420,
+            0.1,
+            0.035,
+            panStart * 0.6,
+            panEnd * 0.6,
+          );
           return;
         }
         createTone("sawtooth", 260, 520, 0.14, 0.05, panStart, panEnd);
@@ -1356,7 +1481,9 @@
 
       // Initial call to show start screen
       window.onload = () => {
-        const savedQualityMode = localStorage.getItem("orbitalDodgeQualityMode");
+        const savedQualityMode = localStorage.getItem(
+          "orbitalDodgeQualityMode",
+        );
         qualityMode = QUALITY_ORDER.includes(savedQualityMode)
           ? savedQualityMode
           : "auto";
