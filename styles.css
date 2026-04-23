@@ -814,11 +814,6 @@ section {
   margin: 0.4rem 0 0 0;
 }
 
-/* Featured card: gold top-bar override */
-.featured-card::before {
-  background: linear-gradient(135deg, #f59e0b, #f97316) !important;
-}
-
 /* Auto-project card entrance */
 .auto-project-card {
   animation: none;
