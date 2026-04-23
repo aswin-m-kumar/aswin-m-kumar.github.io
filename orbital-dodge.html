@@ -944,6 +944,7 @@
         score += points;
         if (score > highScore) {
           highScore = score;
+          localStorage.setItem("orbitalDodgeHighScore", String(highScore));
           highScoreEl.innerText = highScore;
         }
         updateHud();
