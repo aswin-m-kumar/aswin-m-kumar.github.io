@@ -2074,15 +2074,9 @@ body {
 .projects-lab-section .featured-card,
 .projects-lab-section .currently-working-banner {
   border-radius: 8px;
-  background: linear-gradient(
-    165deg,
-    rgba(20, 24, 36, 0.96),
-    rgba(13, 21, 21, 0.92)
-  );
-  border: 1px solid rgba(0, 240, 255, 0.15);
-  box-shadow:
-    0 0 0 1px rgba(0, 240, 255, 0.08),
-    0 16px 26px rgba(0, 0, 0, 0.24);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 24px var(--shadow);
 }
 
 .projects-lab-section .project-card:hover,
@@ -2232,8 +2226,9 @@ body {
 .tag,
 .exp-tag,
 .skill-tag {
-  border-color: rgba(255, 255, 255, 0.08);
-  background: rgba(148, 163, 184, 0.09);
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
 }
 
 .contact-form {

@@ -77,10 +77,10 @@
 }
 .exp-stat-pill {
   display: flex; align-items: center; gap: 0.65rem;
-  background: linear-gradient(160deg, rgba(20,24,36,0.92), rgba(13,21,21,0.86));
-  border: 1px solid rgba(0,240,255,0.18);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 10px; padding: 0.8rem 1.2rem;
-  box-shadow: 0 0 0 1px rgba(0,240,255,0.08), 0 14px 24px rgba(0,0,0,0.22);
+  box-shadow: 0 10px 22px var(--shadow);
   transition: transform 0.28s, box-shadow 0.28s;
 }
 .exp-stat-pill:hover { transform: translateY(-4px); box-shadow: 4px 4px 0 rgba(255,0,85,0.4); }
