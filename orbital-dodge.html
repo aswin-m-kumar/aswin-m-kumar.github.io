@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Orbital Dodge Game</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
       rel="stylesheet"
@@ -13,7 +13,14 @@
       body {
         font-family: "Poppins", sans-serif;
         overflow: hidden;
-        touch-action: none; /* Disables double-tap to zoom on mobile */
+        touch-action: none;
+        background-color: #000;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
       }
       canvas {
         display: block;
@@ -234,16 +241,52 @@
       .low-quality-ui .hud-pill,
       .low-quality-ui .hud-button,
       .low-quality-ui .help-chip,
-      .low-quality-ui .stage-flavor {
+      .low-quality-ui .stage-flavor,
+      .reduced-blur-ui .hud-pill,
+      .reduced-blur-ui .hud-button,
+      .reduced-blur-ui .help-chip,
+      .reduced-blur-ui .stage-flavor {
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
       }
+      .hidden { display: none; }
+      #modalTitle {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #67e8f9;
+      }
+      @media (min-width: 768px) {
+        #modalTitle { font-size: 3rem; }
+      }
+      #modalText {
+        font-size: 1.125rem;
+        margin-bottom: 1.5rem;
+      }
+      #finalScore {
+        font-size: 1.5rem;
+        margin-top: 1rem;
+        font-weight: 600;
+      }
+      #startButton {
+        background-color: #06b6d4;
+        color: #000;
+        font-weight: 700;
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        font-size: 1.25rem;
+        transition: all 300ms;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      #startButton:hover {
+        background-color: #22d3ee;
+      }
     </style>
   </head>
-  <body
-    class="bg-black text-white flex items-center justify-center h-screen m-0 unselectable"
-  >
+  <body class="unselectable">
     <!-- Game Canvas -->
     <canvas id="gameCanvas"></canvas>
 
@@ -270,22 +313,12 @@
     <!-- Start/Game Over Modal -->
     <div id="modal" class="modal">
       <div class="modal-content">
-        <h1
-          id="modalTitle"
-          class="text-4xl md:text-5xl font-bold mb-4 text-cyan-300"
-        >
-          Orbital Dodge
-        </h1>
-        <p id="modalText" class="text-lg mb-6">
+        <h1 id="modalTitle">Orbital Dodge</h1>
+        <p id="modalText">
           You can't outrun gravity. But you can outlast it.
         </p>
-        <p id="finalScore" class="text-2xl mt-4 font-semibold hidden"></p>
-        <button
-          id="startButton"
-          class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 px-8 rounded-lg text-xl transition duration-300"
-        >
-          Start Game
-        </button>
+        <p id="finalScore" class="hidden"></p>
+        <button id="startButton">Start Game</button>
         <button id="shareButton" class="share-button hidden" type="button">
           Share Run
         </button>
@@ -341,7 +374,8 @@
       let qualityMode, activeQuality, qualityPreset, renderScale;
       let adaptiveEffectScale, adaptiveSpawnDelayScale;
       let frameSampleTotalMs, frameSampleCount;
-      let audioCtx, audioMaster;
+      let audioCtx, audioMaster, audioReady;
+      let prevHudScore, prevHudHighScore, prevHudStage, prevHudShield, prevHudCombo;
 
       const COMBO_RESET_MS = 2000;
       const MIN_STAGE = 1;
@@ -439,6 +473,10 @@
           "low-quality-ui",
           activeQuality === "low",
         );
+        document.body.classList.toggle(
+          "reduced-blur-ui",
+          activeQuality === "medium",
+        );
 
         const oldCenter = center || {
           x: window.innerWidth / 2,
@@ -513,6 +551,9 @@
         adaptiveSpawnDelayScale = 1;
         frameSampleTotalMs = 0;
         frameSampleCount = 0;
+        prevHudScore = prevHudHighScore = prevHudStage = prevHudCombo = -1;
+        prevHudShield = null;
+        audioReady = false;
         hasShield = false;
         score = 0;
         stage = MIN_STAGE;
@@ -642,7 +683,6 @@
           if (dist - projectile.size / 2 - player.radius < 1) {
             if (hasShield) {
               hasShield = false;
-              updateHud();
               burst(player.x, player.y, "#67e8f9", 18);
               addFloatingText(
                 player.x,
@@ -693,7 +733,6 @@
           const dist = Math.hypot(player.x - powerUp.x, player.y - powerUp.y);
           if (dist < player.radius + powerUp.radius) {
             hasShield = true;
-            updateHud();
             burst(powerUp.x, powerUp.y, "#22d3ee", 16);
             addFloatingText(powerUp.x, powerUp.y - 18, "+Shield", "#67e8f9");
             playShieldSound();
@@ -714,6 +753,7 @@
 
       function drawStars(delta) {
         ctx.save();
+        ctx.fillStyle = "#dffbff";
         const starStep = adaptiveEffectScale < 0.72 ? 2 : 1;
         for (let i = 0; i < stars.length; i += starStep) {
           const star = stars[i];
@@ -730,10 +770,8 @@
             star.x = Math.random() * canvas.width;
           }
           ctx.globalAlpha = Math.min(1, star.alpha * layerAlpha);
-          ctx.fillStyle = "#dffbff";
-          ctx.beginPath();
-          ctx.arc(star.x, star.y, star.radius * layerRadius, 0, Math.PI * 2);
-          ctx.fill();
+          const r = star.radius * layerRadius;
+          ctx.fillRect(star.x - r, star.y - r, r * 2, r * 2);
         }
         ctx.globalAlpha = 1;
         ctx.restore();
@@ -832,8 +870,10 @@
           ctx.arc(this.x, this.y, this.radius + 9 + pulse, 0, Math.PI * 2);
           ctx.stroke();
           ctx.fillStyle = "#67e8f9";
-          ctx.shadowColor = "#67e8f9";
-          ctx.shadowBlur = 16 * qualityPreset.blurScale;
+          if (qualityPreset.glowEnabled) {
+            ctx.shadowColor = "#67e8f9";
+            ctx.shadowBlur = 16 * qualityPreset.blurScale * adaptiveEffectScale;
+          }
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
           ctx.fill();
@@ -1106,6 +1146,7 @@
       }
 
       function ensureAudioReady() {
+        if (audioReady) return true;
         const AudioContextClass =
           window.AudioContext || window.webkitAudioContext;
         if (!AudioContextClass) return false;
@@ -1117,6 +1158,8 @@
         }
         if (audioCtx.state === "suspended") {
           audioCtx.resume();
+        } else {
+          audioReady = true;
         }
         return true;
       }
@@ -1200,14 +1243,29 @@
       // --- Game State & UI ---
 
       function updateHud() {
-        scoreEl.innerText = score;
-        highScoreEl.innerText = highScore;
-        stageEl.innerText = stage;
-        shieldStatusEl.innerText = hasShield ? "Ready" : "Empty";
-        shieldStatusEl.style.color = hasShield ? "#67e8f9" : "#94a3b8";
-        comboMultiplierEl.innerText = `x${comboMultiplier}`;
-        comboMultiplierEl.style.color =
-          comboMultiplier > 1 ? "#facc15" : "#cbd5e1";
+        if (score !== prevHudScore) {
+          scoreEl.innerText = score;
+          prevHudScore = score;
+        }
+        if (highScore !== prevHudHighScore) {
+          highScoreEl.innerText = highScore;
+          prevHudHighScore = highScore;
+        }
+        if (stage !== prevHudStage) {
+          stageEl.innerText = stage;
+          prevHudStage = stage;
+        }
+        if (hasShield !== prevHudShield) {
+          shieldStatusEl.innerText = hasShield ? "Ready" : "Empty";
+          shieldStatusEl.style.color = hasShield ? "#67e8f9" : "#94a3b8";
+          prevHudShield = hasShield;
+        }
+        if (comboMultiplier !== prevHudCombo) {
+          comboMultiplierEl.innerText = `x${comboMultiplier}`;
+          comboMultiplierEl.style.color =
+            comboMultiplier > 1 ? "#facc15" : "#cbd5e1";
+          prevHudCombo = comboMultiplier;
+        }
       }
 
       function updateScore(points) {
@@ -1215,9 +1273,7 @@
         if (score > highScore) {
           highScore = score;
           localStorage.setItem("orbitalDodgeHighScore", String(highScore));
-          highScoreEl.innerText = highScore;
         }
-        updateHud();
       }
 
       function setPaused(paused) {
