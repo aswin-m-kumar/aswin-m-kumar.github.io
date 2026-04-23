@@ -221,6 +221,16 @@
       .share-button.hidden {
         display: none;
       }
+      .quality-button {
+        min-height: 38px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(15, 23, 42, 0.84);
+        color: #dbeafe;
+        font-size: 0.76rem;
+        font-weight: 700;
+        padding: 0.45rem 0.6rem;
+      }
     </style>
   </head>
   <body
@@ -240,6 +250,9 @@
       </div>
       <div class="hud-actions">
         <button id="pauseButton" class="hud-button" type="button">Pause</button>
+        <button id="qualityButton" class="quality-button" type="button">
+          Q: Auto
+        </button>
         <div class="help-chip">Tap / Space to reverse<br />P to pause</div>
       </div>
     </div>
@@ -286,6 +299,7 @@
       const stageEl = document.getElementById("stage");
       const shieldStatusEl = document.getElementById("shieldStatus");
       const pauseButton = document.getElementById("pauseButton");
+      const qualityButton = document.getElementById("qualityButton");
       const comboMultiplierEl = document.getElementById("comboMultiplier");
       const stageFlavorEl = document.getElementById("stageFlavor");
       const shareButton = document.getElementById("shareButton");
@@ -314,6 +328,7 @@
       let shakeIntensity, shakeDuration, shakeElapsed;
       let stageFlavorTimer, stageFlavorDuration, lastStageAnnounced;
       let runStartTime, finalRunMs, shareSnapshotDataUrl, lastDeathLine;
+      let qualityMode, activeQuality, qualityPreset, renderScale;
       let audioCtx, audioMaster;
 
       const COMBO_RESET_MS = 2000;
@@ -322,6 +337,42 @@
       const COLOR_CYAN = { r: 0, g: 255, b: 255 };
       const COLOR_ORANGE = { r: 255, g: 165, b: 0 };
       const COLOR_RED = { r: 255, g: 68, b: 68 };
+      const QUALITY_ORDER = ["auto", "low", "medium", "high"];
+      const QUALITY_PRESETS = {
+        low: {
+          renderScale: 0.8,
+          starDensity: 0.58,
+          blurScale: 0.52,
+          maxParticles: 110,
+          particleSpawnScale: 0.6,
+          maxFloatingTexts: 8,
+          shakeScale: 0.72,
+          audioLevel: 1,
+          shareEnabled: false,
+        },
+        medium: {
+          renderScale: 0.92,
+          starDensity: 0.8,
+          blurScale: 0.78,
+          maxParticles: 165,
+          particleSpawnScale: 0.85,
+          maxFloatingTexts: 12,
+          shakeScale: 0.9,
+          audioLevel: 2,
+          shareEnabled: true,
+        },
+        high: {
+          renderScale: 1,
+          starDensity: 1,
+          blurScale: 1,
+          maxParticles: 240,
+          particleSpawnScale: 1,
+          maxFloatingTexts: 18,
+          shakeScale: 1,
+          audioLevel: 3,
+          shareEnabled: true,
+        },
+      };
       const DEATH_LINES = [
         (cycles) => `The debris won. But the probe lasted ${cycles} cycles.`,
         () => "System failure. The star didn't wait.",
@@ -330,17 +381,89 @@
 
       // --- Game Setup and Control ---
 
+      function isLikelyMobile() {
+        return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+      }
+
+      function detectAutoQualityMode() {
+        const cores = navigator.hardwareConcurrency || 4;
+        const memory = navigator.deviceMemory || 4;
+        const mobile = isLikelyMobile();
+        if (mobile && (cores <= 6 || memory <= 4)) return "low";
+        if (mobile) return "medium";
+        return "high";
+      }
+
+      function updateQualityButtonLabel() {
+        const activeLabel = activeQuality
+          ? activeQuality.charAt(0).toUpperCase() + activeQuality.slice(1)
+          : "-";
+        qualityButton.textContent =
+          qualityMode === "auto"
+            ? `Q: Auto (${activeLabel})`
+            : `Q: ${activeLabel}`;
+      }
+
+      function applyQualityMode(mode, isInitial = false) {
+        qualityMode = mode;
+        localStorage.setItem("orbitalDodgeQualityMode", qualityMode);
+        activeQuality = mode === "auto" ? detectAutoQualityMode() : mode;
+        qualityPreset = QUALITY_PRESETS[activeQuality] || QUALITY_PRESETS.medium;
+        renderScale = qualityPreset.renderScale;
+
+        const oldCenter = center || {
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2,
+        };
+        resizeCanvas();
+        createStars();
+
+        if (player) {
+          player.x += center.x - oldCenter.x;
+          player.y += center.y - oldCenter.y;
+        }
+
+        if (!qualityPreset.shareEnabled) {
+          shareButton.classList.add("hidden");
+        }
+
+        updateQualityButtonLabel();
+        if (!isInitial && player) {
+          addFloatingText(
+            player.x,
+            player.y - 28,
+            `Quality: ${activeQuality.toUpperCase()}`,
+            "#94a3b8",
+          );
+        }
+      }
+
+      function cycleQualityMode() {
+        const currentIndex = QUALITY_ORDER.indexOf(qualityMode || "auto");
+        const nextMode = QUALITY_ORDER[(currentIndex + 1) % QUALITY_ORDER.length];
+        applyQualityMode(nextMode);
+      }
+
       function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const scale = renderScale || 1;
+        canvas.width = Math.max(1, Math.floor(width * scale));
+        canvas.height = Math.max(1, Math.floor(height * scale));
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
         center = { x: canvas.width / 2, y: canvas.height / 2 };
         orbitalRadius = Math.max(72, Math.min(canvas.width, canvas.height) / 5);
       }
 
       function createStars() {
+        const density = qualityPreset ? qualityPreset.starDensity : 1;
         const count = Math.min(
           140,
-          Math.max(55, Math.floor((canvas.width * canvas.height) / 14000)),
+          Math.max(
+            42,
+            Math.floor((canvas.width * canvas.height * density) / 14000),
+          ),
         );
         stars = Array.from({ length: count }, () => ({
           x: Math.random() * canvas.width,
@@ -353,8 +476,7 @@
       }
 
       function init() {
-        resizeCanvas();
-        createStars();
+        applyQualityMode(qualityMode || "auto", true);
         isGameOver = false;
         isPaused = false;
         hasShield = false;
@@ -446,7 +568,7 @@
 
         const pulse = (Math.sin(timestamp / 800) + 1) / 2;
         const pulseRadius = 8 + pulse * 6;
-        const pulseBlur = 10 + pulse * 15;
+        const pulseBlur = (10 + pulse * 15) * qualityPreset.blurScale;
         ctx.beginPath();
         ctx.arc(center.x, center.y, pulseRadius, 0, Math.PI * 2, false);
         ctx.fillStyle = "#fff5c0";
@@ -575,7 +697,7 @@
         ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2, false);
         ctx.fillStyle = player.color;
         ctx.shadowColor = player.color;
-        ctx.shadowBlur = 15;
+        ctx.shadowBlur = 15 * qualityPreset.blurScale;
         ctx.fill();
         ctx.shadowBlur = 0;
 
@@ -622,7 +744,7 @@
           ctx.rotate(this.angle);
           ctx.fillStyle = this.color;
           ctx.shadowColor = this.color;
-          ctx.shadowBlur = 10;
+          ctx.shadowBlur = 10 * qualityPreset.blurScale;
           ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
           ctx.shadowBlur = 0;
           ctx.restore();
@@ -654,7 +776,7 @@
           ctx.stroke();
           ctx.fillStyle = "#67e8f9";
           ctx.shadowColor = "#67e8f9";
-          ctx.shadowBlur = 16;
+          ctx.shadowBlur = 16 * qualityPreset.blurScale;
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
           ctx.fill();
@@ -704,7 +826,11 @@
       }
 
       function burst(x, y, color, count) {
-        for (let i = 0; i < count; i++) {
+        const scaledCount = Math.max(
+          1,
+          Math.floor(count * qualityPreset.particleSpawnScale),
+        );
+        for (let i = 0; i < scaledCount; i++) {
           const theta = Math.random() * Math.PI * 2;
           const speed = Math.random() * 2.5 + 0.8;
           particles.push({
@@ -715,6 +841,9 @@
             life: 1,
             color,
           });
+        }
+        if (particles.length > qualityPreset.maxParticles) {
+          particles.splice(0, particles.length - qualityPreset.maxParticles);
         }
       }
 
@@ -739,6 +868,9 @@
 
       function addFloatingText(x, y, text, color) {
         floatingTexts.push({ x, y, text, color, life: 1, rise: 0 });
+        if (floatingTexts.length > qualityPreset.maxFloatingTexts) {
+          floatingTexts.splice(0, floatingTexts.length - qualityPreset.maxFloatingTexts);
+        }
       }
 
       function updateFloatingTexts(delta) {
@@ -765,7 +897,10 @@
       }
 
       function addShake(intensity, durationMs) {
-        shakeIntensity = Math.max(shakeIntensity, intensity);
+        shakeIntensity = Math.max(
+          shakeIntensity,
+          intensity * qualityPreset.shakeScale,
+        );
         shakeDuration = Math.max(shakeDuration, durationMs);
         shakeElapsed = 0;
       }
@@ -913,13 +1048,23 @@
       function playNearMissSound() {
         const panStart = Math.random() * 1.2 - 0.6;
         const panEnd = -panStart;
+        if (qualityPreset.audioLevel <= 1) {
+          createTone("triangle", 280, 420, 0.1, 0.035, panStart * 0.6, panEnd * 0.6);
+          return;
+        }
         createTone("sawtooth", 260, 520, 0.14, 0.05, panStart, panEnd);
       }
 
       function playShieldSound() {
+        if (qualityPreset.audioLevel <= 1) {
+          createTone("sine", 460, 760, 0.1, 0.035, 0, 0);
+          return;
+        }
         createTone("sine", 420, 620, 0.09, 0.04, -0.12, 0.12);
         createTone("sine", 620, 860, 0.13, 0.035, 0.1, -0.1);
-        createTone("triangle", 860, 1120, 0.16, 0.03, 0, 0);
+        if (qualityPreset.audioLevel >= 3) {
+          createTone("triangle", 860, 1120, 0.16, 0.03, 0, 0);
+        }
       }
 
       function playDeathSound() {
@@ -1001,7 +1146,11 @@
           DEATH_LINES[Math.floor(Math.random() * DEATH_LINES.length)];
         lastDeathLine = selectedDeathLine(score);
         modalText.innerText = lastDeathLine;
-        shareButton.classList.remove("hidden");
+        if (qualityPreset.shareEnabled) {
+          shareButton.classList.remove("hidden");
+        } else {
+          shareButton.classList.add("hidden");
+        }
       }
 
       async function showStartScreen() {
@@ -1126,7 +1275,7 @@
       }
 
       async function downloadShareCard() {
-        if (!isGameOver) return;
+        if (!isGameOver || !qualityPreset.shareEnabled) return;
         shareButton.disabled = true;
         shareButton.textContent = "Preparing...";
         try {
@@ -1178,6 +1327,7 @@
       });
 
       shareButton.addEventListener("click", downloadShareCard);
+      qualityButton.addEventListener("click", cycleQualityMode);
 
       pauseButton.addEventListener("click", togglePause);
 
@@ -1206,8 +1356,14 @@
 
       // Initial call to show start screen
       window.onload = () => {
-        resizeCanvas();
-        createStars();
+        const savedQualityMode = localStorage.getItem("orbitalDodgeQualityMode");
+        qualityMode = QUALITY_ORDER.includes(savedQualityMode)
+          ? savedQualityMode
+          : "auto";
+        activeQuality = "medium";
+        qualityPreset = QUALITY_PRESETS.medium;
+        renderScale = qualityPreset.renderScale;
+        applyQualityMode(qualityMode, true);
         highScore = Number(localStorage.getItem("orbitalDodgeHighScore") || 0);
         score = 0;
         stage = MIN_STAGE;
