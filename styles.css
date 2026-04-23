@@ -2191,6 +2191,7 @@ body {
   top: 0.7rem;
   width: 28px;
   height: 28px;
+  background: none;
   border-left: 2px solid rgba(0, 240, 255, 0.82);
   border-top: 2px solid rgba(0, 240, 255, 0.82);
   opacity: 0.5;
