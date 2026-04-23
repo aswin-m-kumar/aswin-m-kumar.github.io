@@ -111,6 +111,26 @@
             color: #cbd5e1;
             text-align: right;
         }
+        .stage-flavor {
+            position: absolute;
+            top: 5.25rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            border: 1px solid rgba(34, 211, 238, 0.24);
+            background: rgba(3, 7, 18, 0.68);
+            color: #e2e8f0;
+            border-radius: 999px;
+            padding: 0.45rem 0.9rem;
+            font-size: 0.82rem;
+            letter-spacing: 0.02em;
+            text-align: center;
+            box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.08), 0 10px 24px rgba(0,0,0,0.22);
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 220ms ease, color 280ms ease, border-color 280ms ease, box-shadow 280ms ease;
+        }
         @media (max-width: 768px) {
             .modal-content {
                 width: 95%;
@@ -142,6 +162,12 @@
                 min-width: 44px;
                 padding: 0.5rem 0.65rem;
                 font-size: 0.86rem;
+            }
+            .stage-flavor {
+                top: 4.8rem;
+                max-width: calc(100vw - 1.5rem);
+                font-size: 0.75rem;
+                padding: 0.4rem 0.65rem;
             }
         }
         .gemini-button {
@@ -184,6 +210,7 @@
             <div class="hud-pill">Best <span id="highScore">0</span></div>
             <div class="hud-pill">Stage <span id="stage">1</span></div>
             <div class="hud-pill">Shield <span id="shieldStatus">Empty</span></div>
+            <div class="hud-pill">Combo <span id="comboMultiplier">x1</span></div>
         </div>
         <div class="hud-actions">
             <button id="pauseButton" class="hud-button" type="button">Pause</button>
@@ -191,11 +218,13 @@
         </div>
     </div>
 
+    <div id="stageFlavor" class="stage-flavor" aria-live="polite"></div>
+
     <!-- Start/Game Over Modal -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <h1 id="modalTitle" class="text-4xl md:text-5xl font-bold mb-4 text-cyan-300">Orbital Dodge</h1>
-            <p id="modalText" class="text-lg mb-6">Tap, click, or press Space to reverse orbit direction. Catch cyan shields. Dodge the red cubes.</p>
+            <p id="modalText" class="text-lg mb-6">You can't outrun gravity. But you can outlast it.</p>
             <p id="finalScore" class="text-2xl mt-4 font-semibold hidden"></p>
             <button id="startButton" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 px-8 rounded-lg text-xl transition duration-300">Start Game</button>
             
@@ -218,12 +247,30 @@
         const stageEl = document.getElementById('stage');
         const shieldStatusEl = document.getElementById('shieldStatus');
         const pauseButton = document.getElementById('pauseButton');
+        const comboMultiplierEl = document.getElementById('comboMultiplier');
+        const stageFlavorEl = document.getElementById('stageFlavor');
 
 
         let player, center, projectiles, powerUps, particles, stars, score, highScore, animationId, isGameOver;
         let angle = 0;
         let orbitalDirection = 1; // 1 for counter-clockwise, -1 for clockwise
         let orbitalRadius, stage, spawnTimer, powerUpTimer, scoreTimer, lastFrame, isPaused, hasShield;
+        let comboMultiplier, comboWindowTimer, floatingTexts, accentColor;
+        let shakeIntensity, shakeDuration, shakeElapsed;
+        let stageFlavorTimer, stageFlavorDuration, lastStageAnnounced;
+        let audioCtx, audioMaster;
+
+        const COMBO_RESET_MS = 2000;
+        const MIN_STAGE = 1;
+        const MAX_STAGE = 12;
+        const COLOR_CYAN = { r: 0, g: 255, b: 255 };
+        const COLOR_ORANGE = { r: 255, g: 165, b: 0 };
+        const COLOR_RED = { r: 255, g: 68, b: 68 };
+        const DEATH_LINES = [
+            (cycles) => `The debris won. But the probe lasted ${cycles} cycles.`,
+            () => 'System failure. The star didn\'t wait.',
+            () => 'Hull breach. The void claims another.'
+        ];
 
 
         // --- Game Setup and Control ---
@@ -253,16 +300,27 @@
             isPaused = false;
             hasShield = false;
             score = 0;
-            stage = 1;
+            stage = MIN_STAGE;
             spawnTimer = 0;
             powerUpTimer = 0;
             scoreTimer = 0;
             lastFrame = performance.now();
             angle = 0;
             orbitalDirection = 1;
+            comboMultiplier = 1;
+            comboWindowTimer = 0;
+            floatingTexts = [];
+            shakeIntensity = 0;
+            shakeDuration = 0;
+            shakeElapsed = 0;
+            stageFlavorTimer = 0;
+            stageFlavorDuration = 2200;
+            lastStageAnnounced = stage;
+            stageFlavorEl.style.opacity = 0;
+            accentColor = getStageColor(stage);
             highScore = Number(localStorage.getItem('orbitalDodgeHighScore') || 0);
             updateHud();
-            player = { x: center.x + orbitalRadius, y: center.y, radius: 15, color: '#00ffff' };
+            player = { x: center.x + orbitalRadius, y: center.y, radius: 15, color: colorToCss(accentColor) };
             projectiles = [];
             powerUps = [];
             particles = [];
@@ -283,7 +341,21 @@
             spawnTimer += deltaMs;
             powerUpTimer += deltaMs;
             scoreTimer += deltaMs;
-            stage = Math.min(12, Math.floor(score / 120) + 1);
+            const previousStage = stage;
+            stage = Math.min(MAX_STAGE, Math.floor(score / 120) + 1);
+            accentColor = getStageColor(stage);
+            if (stage !== previousStage) {
+                showStageFlavor(stage);
+            }
+
+            if (comboMultiplier > 1) {
+                comboWindowTimer += deltaMs;
+                if (comboWindowTimer >= COMBO_RESET_MS) {
+                    comboMultiplier = 1;
+                    comboWindowTimer = 0;
+                }
+            }
+
             if (scoreTimer >= 250) {
                 updateScore(1);
                 scoreTimer = 0;
@@ -297,6 +369,8 @@
                 powerUpTimer = 0;
             }
 
+            const shakeOffset = getShakeOffset(deltaMs);
+            ctx.setTransform(1, 0, 0, 1, shakeOffset.x, shakeOffset.y);
             ctx.fillStyle = 'rgba(10, 10, 10, 0.25)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             drawStars(delta);
@@ -306,7 +380,8 @@
             ctx.fill();
             ctx.beginPath();
             ctx.arc(center.x, center.y, orbitalRadius, 0, Math.PI * 2, false);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.strokeStyle = colorToRgba(accentColor, 0.42);
+            ctx.lineWidth = 2;
             ctx.stroke();
             updatePlayer();
             drawPlayer();
@@ -321,6 +396,7 @@
                         hasShield = false;
                         updateHud();
                         burst(player.x, player.y, '#67e8f9', 18);
+                        addFloatingText(player.x, player.y - 16, 'Shield Used', '#67e8f9');
                         projectiles.splice(index, 1);
                         continue;
                     }
@@ -329,8 +405,14 @@
                 }
                 if (dist - projectile.size / 2 - player.radius < 20 && !projectile.nearMissed) {
                     projectile.nearMissed = true;
-                    updateScore(5);
+                    comboMultiplier = Math.min(5, comboMultiplier + 1);
+                    comboWindowTimer = 0;
+                    const nearMissPoints = 5 * comboMultiplier;
+                    updateScore(nearMissPoints);
+                    addFloatingText(player.x, player.y - 24, `+${nearMissPoints}  x${comboMultiplier}`, '#facc15');
                     burst(player.x, player.y, '#facc15', 5);
+                    addShake(3.5, 200);
+                    playNearMissSound();
                 }
                 if (projectile.x + projectile.size < 0 || projectile.x - projectile.size > canvas.width || projectile.y + projectile.size < 0 || projectile.y - projectile.size > canvas.height) {
                     projectiles.splice(index, 1);
@@ -347,6 +429,8 @@
                     hasShield = true;
                     updateHud();
                     burst(powerUp.x, powerUp.y, '#22d3ee', 16);
+                    addFloatingText(powerUp.x, powerUp.y - 18, '+Shield', '#67e8f9');
+                    playShieldSound();
                     powerUps.splice(index, 1);
                 } else if (powerUp.age > 7500) {
                     powerUps.splice(index, 1);
@@ -354,6 +438,9 @@
             }
 
             updateParticles(delta);
+            updateFloatingTexts(delta);
+            updateStageFlavor(deltaMs);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
             updateHud();
         }
         
@@ -399,12 +486,15 @@
             angle += (0.018 + stage * 0.0015) * orbitalDirection;
             player.x = center.x + Math.cos(angle) * orbitalRadius;
             player.y = center.y + Math.sin(angle) * orbitalRadius;
+            player.color = colorToCss(accentColor);
         }
         
         function switchDirection() {
             if(!player || isGameOver || isPaused) return;
+            ensureAudioReady();
             orbitalDirection *= -1;
-            burst(player.x, player.y, '#00ffff', 6);
+            burst(player.x, player.y, player.color, 6);
+            playSwitchSound();
         }
 
         // --- Projectile Logic ---
@@ -535,6 +625,179 @@
                 ctx.globalAlpha = 1;
             }
         }
+
+        function addFloatingText(x, y, text, color) {
+            floatingTexts.push({ x, y, text, color, life: 1, rise: 0 });
+        }
+
+        function updateFloatingTexts(delta) {
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.font = '700 18px Poppins';
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                const popup = floatingTexts[i];
+                popup.rise += 0.9 * delta;
+                popup.life -= 0.04 * delta;
+                if (popup.life <= 0) {
+                    floatingTexts.splice(i, 1);
+                    continue;
+                }
+                ctx.globalAlpha = Math.max(0, popup.life);
+                ctx.fillStyle = popup.color;
+                ctx.shadowColor = popup.color;
+                ctx.shadowBlur = 8;
+                ctx.fillText(popup.text, popup.x, popup.y - popup.rise);
+            }
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+            ctx.restore();
+        }
+
+        function addShake(intensity, durationMs) {
+            shakeIntensity = Math.max(shakeIntensity, intensity);
+            shakeDuration = Math.max(shakeDuration, durationMs);
+            shakeElapsed = 0;
+        }
+
+        function getShakeOffset(deltaMs) {
+            if (shakeElapsed >= shakeDuration || shakeDuration <= 0) {
+                return { x: 0, y: 0 };
+            }
+            shakeElapsed += deltaMs;
+            const progress = Math.min(1, shakeElapsed / shakeDuration);
+            const falloff = 1 - progress;
+            const magnitude = shakeIntensity * falloff;
+            return {
+                x: (Math.random() * 2 - 1) * magnitude,
+                y: (Math.random() * 2 - 1) * magnitude,
+            };
+        }
+
+        function lerp(a, b, t) {
+            return a + (b - a) * t;
+        }
+
+        function lerpColor(from, to, t) {
+            return {
+                r: Math.round(lerp(from.r, to.r, t)),
+                g: Math.round(lerp(from.g, to.g, t)),
+                b: Math.round(lerp(from.b, to.b, t)),
+            };
+        }
+
+        function colorToCss(color) {
+            return `rgb(${color.r}, ${color.g}, ${color.b})`;
+        }
+
+        function colorToRgba(color, alpha) {
+            return `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
+        }
+
+        function getStageColor(currentStage) {
+            const normalized = Math.max(0, Math.min(1, (currentStage - MIN_STAGE) / (MAX_STAGE - MIN_STAGE)));
+            if (normalized < 0.5) {
+                return lerpColor(COLOR_CYAN, COLOR_ORANGE, normalized * 2);
+            }
+            return lerpColor(COLOR_ORANGE, COLOR_RED, (normalized - 0.5) * 2);
+        }
+
+        function getStageFlavor(stageNumber) {
+            if (stageNumber <= 2) return 'Debris field detected. Initiating evasive protocol.';
+            if (stageNumber <= 4) return 'Gravitational anomalies increasing.';
+            if (stageNumber <= 6) return 'Hull stress critical. Deflector online.';
+            if (stageNumber <= 8) return 'Star entering final collapse sequence.';
+            if (stageNumber <= 10) return 'All systems failing. Hold position.';
+            return 'There is no escape. Only endurance.';
+        }
+
+        function showStageFlavor(stageNumber) {
+            if (stageNumber === lastStageAnnounced) return;
+            lastStageAnnounced = stageNumber;
+            stageFlavorEl.innerText = getStageFlavor(stageNumber);
+            stageFlavorEl.style.color = colorToRgba(accentColor, 0.95);
+            stageFlavorEl.style.borderColor = colorToRgba(accentColor, 0.36);
+            stageFlavorEl.style.boxShadow = `0 0 0 1px ${colorToRgba(accentColor, 0.14)}, 0 10px 24px rgba(0,0,0,0.24), 0 0 20px ${colorToRgba(accentColor, 0.18)}`;
+            stageFlavorEl.style.opacity = 1;
+            stageFlavorTimer = 0;
+        }
+
+        function updateStageFlavor(deltaMs) {
+            if (stageFlavorEl.style.opacity === '0' || !stageFlavorEl.innerText) return;
+            stageFlavorTimer += deltaMs;
+            if (stageFlavorTimer >= stageFlavorDuration) {
+                stageFlavorEl.style.opacity = 0;
+                return;
+            }
+            const fadeWindow = 500;
+            if (stageFlavorTimer > stageFlavorDuration - fadeWindow) {
+                const t = (stageFlavorDuration - stageFlavorTimer) / fadeWindow;
+                stageFlavorEl.style.opacity = Math.max(0, t).toFixed(2);
+            } else {
+                stageFlavorEl.style.opacity = 1;
+            }
+        }
+
+        function ensureAudioReady() {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) return false;
+            if (!audioCtx) {
+                audioCtx = new AudioContextClass();
+                audioMaster = audioCtx.createGain();
+                audioMaster.gain.value = 0.17;
+                audioMaster.connect(audioCtx.destination);
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return true;
+        }
+
+        function createTone(type, freqFrom, freqTo, durationSec, gainPeak, panFrom = 0, panTo = 0) {
+            if (!ensureAudioReady()) return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const panner = audioCtx.createStereoPanner();
+
+            osc.type = type;
+            osc.frequency.setValueAtTime(freqFrom, now);
+            osc.frequency.exponentialRampToValueAtTime(Math.max(20, freqTo), now + durationSec);
+
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(gainPeak, now + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+            panner.pan.setValueAtTime(panFrom, now);
+            panner.pan.linearRampToValueAtTime(panTo, now + durationSec);
+
+            osc.connect(gain);
+            gain.connect(panner);
+            panner.connect(audioMaster);
+
+            osc.start(now);
+            osc.stop(now + durationSec + 0.02);
+        }
+
+        function playSwitchSound() {
+            createTone('triangle', 760, 420, 0.07, 0.055, 0, 0);
+        }
+
+        function playNearMissSound() {
+            const panStart = (Math.random() * 1.2) - 0.6;
+            const panEnd = -panStart;
+            createTone('sawtooth', 260, 520, 0.14, 0.05, panStart, panEnd);
+        }
+
+        function playShieldSound() {
+            createTone('sine', 420, 620, 0.09, 0.04, -0.12, 0.12);
+            createTone('sine', 620, 860, 0.13, 0.035, 0.1, -0.1);
+            createTone('triangle', 860, 1120, 0.16, 0.03, 0, 0);
+        }
+
+        function playDeathSound() {
+            createTone('square', 160, 55, 0.35, 0.09, 0, 0);
+            createTone('triangle', 120, 42, 0.42, 0.06, 0, 0);
+        }
         
         // --- Game State & UI ---
 
@@ -544,6 +807,8 @@
             stageEl.innerText = stage;
             shieldStatusEl.innerText = hasShield ? 'Ready' : 'Empty';
             shieldStatusEl.style.color = hasShield ? '#67e8f9' : '#94a3b8';
+            comboMultiplierEl.innerText = `x${comboMultiplier}`;
+            comboMultiplierEl.style.color = comboMultiplier > 1 ? '#facc15' : '#cbd5e1';
         }
 
         function updateScore(points) {
@@ -583,6 +848,9 @@
             isPaused = false;
             cancelAnimationFrame(animationId);
             pauseButton.textContent = 'Pause';
+            addShake(8, 400);
+            playDeathSound();
+            stageFlavorEl.style.opacity = 0;
 
             if (score > highScore) {
                 highScore = score;
@@ -595,12 +863,13 @@
             finalScoreEl.innerText = `Final Score: ${score}`;
             finalScoreEl.classList.remove('hidden');
             startButton.innerText = 'Play Again';
-            modalText.innerText = hasShield ? 'Shield spent. The next hit got through.' : 'You were hit!';
+              const selectedDeathLine = DEATH_LINES[Math.floor(Math.random() * DEATH_LINES.length)];
+              modalText.innerText = selectedDeathLine(score);
         }
 
         async function showStartScreen() {
              modal.style.display = 'flex';
-             modalText.innerText = 'Tap, click, or press Space to reverse orbit direction. Catch cyan shields. Dodge the red cubes.';
+               modalText.innerText = 'You can\'t outrun gravity. But you can outlast it.';
              startButton.innerText = 'Start Game';
              finalScoreEl.classList.add('hidden');
              modalTitle.innerText = 'Orbital Dodge';
@@ -620,11 +889,13 @@
 
         canvas.addEventListener('pointerdown', (e) => {
             e.preventDefault();
+            ensureAudioReady();
             switchDirection();
         });
         
         startButton.addEventListener('click', (e) => {
             e.stopPropagation();
+            ensureAudioReady();
             if (isPaused && !isGameOver) {
                 setPaused(false);
                 return;
@@ -637,6 +908,7 @@
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                 e.preventDefault();
+                ensureAudioReady();
                 if (isPaused && !isGameOver) {
                     setPaused(false);
                 } else {
@@ -658,8 +930,19 @@
             createStars();
             highScore = Number(localStorage.getItem('orbitalDodgeHighScore') || 0);
             score = 0;
-            stage = 1;
+            stage = MIN_STAGE;
             hasShield = false;
+            comboMultiplier = 1;
+            comboWindowTimer = 0;
+            floatingTexts = [];
+            accentColor = getStageColor(stage);
+            shakeIntensity = 0;
+            shakeDuration = 0;
+            shakeElapsed = 0;
+            stageFlavorTimer = 0;
+            stageFlavorDuration = 2200;
+            lastStageAnnounced = stage;
+            stageFlavorEl.style.opacity = 0;
             updateHud();
             showStartScreen();
         };
