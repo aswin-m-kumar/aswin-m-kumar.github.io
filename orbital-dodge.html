@@ -327,8 +327,9 @@
 
     <script>
       const canvas = document.getElementById("gameCanvas");
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
       const ctx =
-        canvas.getContext("2d", { alpha: false, desynchronized: true }) ||
+        canvas.getContext("2d", { alpha: false, desynchronized: !isMobile }) ||
         canvas.getContext("2d");
 
       // UI Elements
@@ -376,6 +377,7 @@
       let frameSampleTotalMs, frameSampleCount;
       let audioCtx, audioMaster, audioReady;
       let prevHudScore, prevHudHighScore, prevHudStage, prevHudShield, prevHudCombo;
+      let logicalW, logicalH;
 
       const COMBO_RESET_MS = 2000;
       const MIN_STAGE = 1;
@@ -386,7 +388,7 @@
       const QUALITY_ORDER = ["auto", "low", "medium", "high"];
       const QUALITY_PRESETS = {
         low: {
-          renderScale: 0.8,
+          renderScale: 1,
           starDensity: 0.58,
           blurScale: 0,
           glowEnabled: false,
@@ -401,7 +403,7 @@
           shareEnabled: false,
         },
         medium: {
-          renderScale: 0.92,
+          renderScale: 1,
           starDensity: 0.8,
           blurScale: 0.78,
           glowEnabled: true,
@@ -440,7 +442,7 @@
       // --- Game Setup and Control ---
 
       function isLikelyMobile() {
-        return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+        return isMobile;
       }
 
       function detectAutoQualityMode() {
@@ -516,12 +518,16 @@
         const width = window.innerWidth;
         const height = window.innerHeight;
         const scale = renderScale || 1;
-        canvas.width = Math.max(1, Math.floor(width * scale));
-        canvas.height = Math.max(1, Math.floor(height * scale));
+        const dpr = isMobile ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+        logicalW = Math.max(1, Math.floor(width * scale));
+        logicalH = Math.max(1, Math.floor(height * scale));
+        canvas.width = Math.max(1, Math.floor(logicalW * dpr));
+        canvas.height = Math.max(1, Math.floor(logicalH * dpr));
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
-        center = { x: canvas.width / 2, y: canvas.height / 2 };
-        orbitalRadius = Math.max(72, Math.min(canvas.width, canvas.height) / 5);
+        if (dpr > 1) ctx.scale(dpr, dpr);
+        center = { x: logicalW / 2, y: logicalH / 2 };
+        orbitalRadius = Math.max(72, Math.min(logicalW, logicalH) / 5);
       }
 
       function createStars() {
@@ -530,12 +536,12 @@
           140,
           Math.max(
             42,
-            Math.floor((canvas.width * canvas.height * density) / 14000),
+            Math.floor((logicalW * logicalH * density) / 14000),
           ),
         );
         stars = Array.from({ length: count }, () => ({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
+          x: Math.random() * logicalW,
+          y: Math.random() * logicalH,
           radius: Math.random() * 1.4 + 0.25,
           drift: Math.random() * 0.22 + 0.04,
           alpha: Math.random() * 0.55 + 0.2,
@@ -637,15 +643,19 @@
         }
 
         const shakeOffset = getShakeOffset(deltaMs);
-        ctx.setTransform(1, 0, 0, 1, shakeOffset.x, shakeOffset.y);
+        const dpr = isMobile ? Math.min(window.devicePixelRatio || 1, 2) : 1;
         const trailAlpha =
           (qualityPreset.trailAlpha || 0) * adaptiveEffectScale;
+        // Clear with identity transform to avoid edge ghosting during shake
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         if (trailAlpha <= 0.02) {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.clearRect(-10, -10, logicalW + 20, logicalH + 20);
         } else {
           ctx.fillStyle = `rgba(10, 10, 10, ${Math.min(0.3, trailAlpha).toFixed(3)})`;
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillRect(-10, -10, logicalW + 20, logicalH + 20);
         }
+        // Now apply shake offset for drawing
+        ctx.setTransform(dpr, 0, 0, dpr, shakeOffset.x, shakeOffset.y);
         drawStars(delta);
 
         const pulse = (Math.sin(timestamp / 800) + 1) / 2;
@@ -717,9 +727,9 @@
           }
           if (
             projectile.x + projectile.size < 0 ||
-            projectile.x - projectile.size > canvas.width ||
+            projectile.x - projectile.size > logicalW ||
             projectile.y + projectile.size < 0 ||
-            projectile.y - projectile.size > canvas.height
+            projectile.y - projectile.size > logicalH
           ) {
             swapPop(projectiles, index);
             updateScore(10);
@@ -745,7 +755,8 @@
         updateParticles(delta);
         updateFloatingTexts(delta);
         updateStageFlavor(deltaMs);
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        const dprEnd = isMobile ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+        ctx.setTransform(dprEnd, 0, 0, dprEnd, 0, 0);
         updateHud();
       }
 
@@ -765,13 +776,14 @@
             star.layer === 0 ? 0.7 : star.layer === 1 ? 1 : 1.1;
 
           star.y += star.drift * layerDrift * delta;
-          if (star.y > canvas.height) {
+          if (star.y > logicalH) {
             star.y = 0;
-            star.x = Math.random() * canvas.width;
+            star.x = Math.random() * logicalW;
           }
           ctx.globalAlpha = Math.min(1, star.alpha * layerAlpha);
-          const r = star.radius * layerRadius;
-          ctx.fillRect(star.x - r, star.y - r, r * 2, r * 2);
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.radius * layerRadius, 0, Math.PI * 2);
+          ctx.fill();
         }
         ctx.globalAlpha = 1;
         ctx.restore();
@@ -887,11 +899,11 @@
         const color = "#ff4d4d";
         let x, y;
         if (Math.random() < 0.5) {
-          x = Math.random() < 0.5 ? 0 - size : canvas.width + size;
-          y = Math.random() * canvas.height;
+          x = Math.random() < 0.5 ? 0 - size : logicalW + size;
+          y = Math.random() * logicalH;
         } else {
-          x = Math.random() * canvas.width;
-          y = Math.random() < 0.5 ? 0 - size : canvas.height + size;
+          x = Math.random() * logicalW;
+          y = Math.random() < 0.5 ? 0 - size : logicalH + size;
         }
         const angleToCenter = Math.atan2(center.y - y, center.x - x);
         const speed = 1.25 + stage * 0.18 + Math.random() * 0.6;
